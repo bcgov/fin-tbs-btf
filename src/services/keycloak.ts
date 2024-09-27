@@ -33,7 +33,7 @@ export const initializeKeycloak = async () => {
         if (auth) {
             return _kc
         } else {
-            _kc.login(loginOptions)
+            await _kc.login(loginOptions)
         }
     } catch (err) {
         console.error(err)
