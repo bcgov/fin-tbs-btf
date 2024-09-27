@@ -31,7 +31,7 @@ router.beforeEach(async (to, _from, next) => {
 
 
     if (to.meta.requiresAuth) {
-        const keycloak = await initializeKeycloak()
+        const keycloak = await initializeKeycloak() as Keycloak
         if (isValidUser(keycloak)) {
             next();
             console.log('valid user')
