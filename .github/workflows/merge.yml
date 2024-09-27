@@ -18,7 +18,9 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Install Dependencies and Build For Production🔧 
+      - name: Install Dependencies and Build For Production🔧
+        env:
+          BASE: /fin-tbs-btf
         run: |
           npm ci
           npm run build
