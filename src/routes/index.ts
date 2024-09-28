@@ -31,7 +31,7 @@ router.beforeEach(async (to, _from, next) => {
 
 
     if (to.meta.requiresAuth) {
-        const keycloak = await initializeKeycloak() as Keycloak
+        const keycloak: Keycloak | undefined = await initializeKeycloak()
         if (isValidUser(keycloak)) {
             next();
             console.log('valid user')
@@ -46,10 +46,10 @@ router.beforeEach(async (to, _from, next) => {
     }
 })
 
-function isValidUser(keycloak: Keycloak) {
+function isValidUser(keycloak: Keycloak | undefined) {
     return keycloak?.authenticated
-        && keycloak.tokenParsed?.aud === 'fin-tbs-btf-5747'
-        && keycloak.tokenParsed?.client_roles?.includes('fin-tbs-btf-admin');
+        && keycloak?.tokenParsed?.aud === 'fin-tbs-btf-5747'
+        && keycloak?.tokenParsed?.client_roles?.includes('fin-tbs-btf-admin');
 }
 
 export default router
