@@ -4,6 +4,7 @@ on:
     branches:
       - main
   workflow_dispatch:
+concurrency: preview-${{ github.ref }}
 permissions:
   contents: write
 jobs:
@@ -15,15 +16,14 @@ jobs:
 
       - name: Install Dependencies and Build For Production🔧
         env:
-          BASE: /fin-tbs-btf-${{github.event.number}}
-          VITE_SSO_REDIRECT_URI: https://bcgov.github.io/fin-tbs-btf-${{github.event.number}}
+          BASE: /fin-tbs-btf/pr-preview/pr-${{github.event.number}}
+          VITE_SSO_REDIRECT_URI: https://bcgov.github.io/fin-tbs-btf/pr-preview/pr-${{github.event.number}}
         run: |
           npm ci
           npm run build-pr
       - uses: tj-actions/branch-names@v8
         id: branch-names
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.6.4
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
         with:
-          folder: dist # The folder the action should deploy.
-          branch: ${{ steps.branch-names.outputs.current_branch }}
+          source-dir: ./dist/
