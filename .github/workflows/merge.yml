@@ -29,3 +29,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.6.4
         with:
           folder: dist # The folder the action should deploy.
+          clean-exclude: pr-preview/
+          force: false
