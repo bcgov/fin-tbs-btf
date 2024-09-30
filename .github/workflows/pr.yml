@@ -15,7 +15,7 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Install Dependencies and Build For Production🔧
+      - name: Install Dependencies and Build For PR🔧
         env:
           BASE: /fin-tbs-btf/pr-preview/pr-${{github.event.number}}
           VITE_SSO_REDIRECT_URI: https://bcgov.github.io/fin-tbs-btf/pr-preview/pr-${{github.event.number}}
