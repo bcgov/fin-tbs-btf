@@ -4,21 +4,29 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "serve": "vite",
     "build": "vue-tsc -b && vite build",
     "build-pr": "vue-tsc -b && vite build --mode pr",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bcgov/bc-sans": "^2.1.0",
+    "@braintree/sanitize-url": "^7.1.0",
     "fin-tbs-btf-frontend": "file:",
     "keycloak-js": "^25.0.6",
+    "pinia": "^2.2.4",
+    "tiny-emitter": "^2.1.0",
     "vue": "^3.5.9",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "vuetify": "^3.7.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
+    "sass": "^1.79.4",
+    "sass-loader": "^16.0.2",
     "typescript": "^5.6.2",
     "vite": "^5.4.8",
+    "vitest": "^2.1.2",
     "vue-tsc": "^2.1.6"
   }
 }
