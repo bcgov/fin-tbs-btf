@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Frontend Server",
+      "request": "launch",
+      "runtimeArgs": ["run-script", "serve"],
+      "runtimeExecutable": "npm",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "cwd": "${workspaceFolder}",
+      "presentation": {
+        "hidden": true,
+        "group": "Individual Servers",
+        "order": 1
+      }
+    },
+    {
+      "name": "Open Frontend URL to Debug",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}",
+      "presentation": {
+        "hidden": true,
+        "group": "Browser",
+        "order": 1
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug webapp",
+      "configurations": ["Frontend Server", "Open Frontend URL to Debug"],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "All",
+        "order": 1
+      }
+    }
+  ]
+}
