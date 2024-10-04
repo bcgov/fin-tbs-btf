@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import router from '../routes';
+
 import { useAuthStore } from '../stores/auth-store';
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
