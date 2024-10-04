@@ -138,7 +138,7 @@ export const NotificationService = {
   Unregisters a callback function so it will no longer be called in 
   response to notification events 
   */
-  unregisterNotificationListener(callback) {
+  unregisterNotificationListener(callback: any) {
     notificationEvents.off(NOTIFICATION_EVENT, callback);
   },
 

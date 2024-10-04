@@ -116,7 +116,7 @@ export default {
         this.styleClass = undefined;
       }
     },
-    onKeyPressed(e) {
+    onKeyPressed(e: any) {
       if ((e.key === 'Escape' || e.key === 'Esc') && this.isVisible) {
         this.processNextNotification();
       }
