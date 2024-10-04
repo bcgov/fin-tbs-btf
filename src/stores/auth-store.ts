@@ -1,6 +1,7 @@
 import Keycloak from "keycloak-js";
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import router from "../routes";
 
 const loginOptions = {
   redirectUri: import.meta.env.VITE_SSO_REDIRECT_URI,
@@ -56,7 +57,7 @@ export const useAuthStore = defineStore("authStore", () => {
       if (!keycloak?.authenticated && forceLoginIfNotAuthenticated) {
         await keycloak.login(loginOptions);
       }
-      onAuthChanged();
+      checkAuth();
       return keycloak;
     } catch (err) {
       console.error(err);
@@ -65,25 +66,34 @@ export const useAuthStore = defineStore("authStore", () => {
 
   const logout = () => {
     keycloak.logout({ redirectUri: import.meta.env.VITE_SSO_REDIRECT_URI });
-    /*
-    window.location.href = `https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl=${encodeURIComponent(
-      `${import.meta.env.VITE_SSO_AUTH_SERVER_URL}/realms/${
-        import.meta.env.VITE_SSO_REALM
-      }/protocol/openid-connect/logout?post_logout_redirect_uri=` +
-        import.meta.env.VITE_SSO_REDIRECT_URI +
-        "&client_id=" +
-        import.meta.env.VITE_SSO_CLIENT_ID
-    )}`;
-    */
   };
 
-  const onAuthChanged = () => {
-    isAuthenticated.value = keycloak?.authenticated == true;
-    user.value = keycloak?.tokenParsed;
-    isAuthorized.value =
+  const checkAuth = () => {
+    const newIsAuthenticated = keycloak?.authenticated == true;
+    const newUser = keycloak?.tokenParsed;
+    const newIsAuthorized =
       keycloak?.authenticated &&
       keycloak?.tokenParsed?.aud === "fin-tbs-btf-5747" &&
       keycloak?.tokenParsed?.client_roles?.includes("fin-tbs-btf-admin");
+
+    const changed =
+      isAuthenticated.value != newIsAuthenticated ||
+      isAuthorized.value != newIsAuthorized ||
+      user.value?.idir_username != newUser?.idir_username;
+
+    isAuthenticated.value = newIsAuthenticated;
+    user.value = newUser;
+    isAuthorized.value = newIsAuthorized;
+
+    if (changed) {
+      onAuthChanged();
+    }
+  };
+
+  const onAuthChanged = () => {
+    if (isAuthenticated.value && !isAuthorized.value) {
+      router.push("unauthorized");
+    }
   };
 
   // Return the public interface for the store
