@@ -16,23 +16,11 @@
 <script setup lang="ts">
 
 import { useAuthStore } from '../stores/auth-store';
-import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 const authStore = useAuthStore();
 const {
   isAuthenticated
 } = storeToRefs(authStore);
-
-onMounted(() => {
-  console.log(`authStore.isAuthorized: ${authStore.isAuthorized}`)
-  //if (authStore.isAuthorized) {
-  //  router.push('/upload')
-  //}
-});
-
-function login() {
-  authStore.init()
-}
 
 </script>
