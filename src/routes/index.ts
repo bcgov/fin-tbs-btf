@@ -1,55 +1,67 @@
-import {createRouter, createWebHistory} from 'vue-router'
-import HelloWorld from '../components/HelloWorld.vue'
-import {initializeKeycloak} from '../services/keycloak'
-import Keycloak from "keycloak-js";
+import { createRouter, createWebHistory } from "vue-router";
+import DashboardPage from "../components/DashboardPage.vue";
 import Unauthorized from "../components/Unauthorized.vue";
+import UploadPage from "../components/UploadPage.vue";
+import { useAuthStore } from "../stores/auth-store";
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
-    routes: [
-        {
-            path: '/',
-            name: 'home',
-            component: HelloWorld,
-            meta: {
-                requiresAuth: true,
-            },
-        },
-        {
-            path: '/unauthorized',
-            name: 'unauthorized',
-            component: Unauthorized,
-            meta: {
-                requiresAuth: false,
-            },
-        }
-
-    ],
-})
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: "/",
+      redirect: "dashboard",
+    },
+    {
+      path: "/dashboard",
+      name: "dashboard",
+      component: DashboardPage,
+      meta: {
+        requiresAuth: false,
+      },
+    },
+    {
+      path: "/upload",
+      name: "upload",
+      component: UploadPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/unauthorized",
+      name: "unauthorized",
+      component: Unauthorized,
+      meta: {
+        requiresAuth: false,
+      },
+    },
+  ],
+});
 
 router.beforeEach(async (to, _from, next) => {
-
-
-    if (to.meta.requiresAuth) {
-        const keycloak: Keycloak | undefined = await initializeKeycloak()
-        if (isValidUser(keycloak)) {
-            next();
-            console.log('valid user')
-            return;
-        } else {
-            console.log('unauthorized user')
-            next('/unauthorized');
-        }
+  const authStore = useAuthStore();
+  await authStore.init(to.meta.requiresAuth as boolean);
+  if (to.meta.requiresAuth) {
+    if (authStore.isAuthorized) {
+      next();
+      return;
     } else {
-        console.log('open page')
-        next();
+      next("/unauthorized");
     }
-})
+  } else {
+    console.log("open page");
+    next();
+  }
+});
 
+/*
 function isValidUser(keycloak: Keycloak | undefined) {
-    return keycloak?.authenticated
-        && keycloak?.tokenParsed?.aud === 'fin-tbs-btf-5747'
-        && keycloak?.tokenParsed?.client_roles?.includes('fin-tbs-btf-admin');
+  return (
+    keycloak?.authenticated &&
+    keycloak?.tokenParsed?.aud === "fin-tbs-btf-5747" &&
+    keycloak?.tokenParsed?.client_roles?.includes("fin-tbs-btf-admin")
+  );
 }
+*/
 
-export default router
+export default router;

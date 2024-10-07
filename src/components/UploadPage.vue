@@ -1,20 +1,33 @@
 <template>
+ <v-row dense >
+    <v-col class="d-flex justify-start">
+      <h5>Upload Page</h5>      
+    </v-col>
+  </v-row>
+  <v-row dense >
+    <v-col class="d-flex flex-column align-start justify-start">
+      <p>Todo: show controls for uploading PDFs</p>
+      <v-btn class="btn-secondary" @click="download">Download audit</v-btn>  
+    </v-col>
+  </v-row>
   
-  <h1>Welcome {{ _kc.tokenParsed?.display_name }}, roles you have are {{ _kc.tokenParsed?.client_roles }}</h1>
-  
-  <button @click="logout">logout</button>
-  <button @click="download">download</button>
-
+    
 </template>
 
 <script setup lang="ts">
-import { logout, _kc } from '../services/keycloak'
+import { useAuthStore } from '../stores/auth-store';
+import { storeToRefs } from 'pinia';
+
+const authStore = useAuthStore();
+const {
+  user
+} = storeToRefs(authStore);
 
 const download = () => {
   // Extract and format the relevant data
   const auditDetails = {
-      idir: _kc.tokenParsed?.idir_username,
-      login: _kc.tokenParsed?.iat ? new Date(_kc.tokenParsed?.iat * 1000).toISOString() : new Date().toISOString(),
+      idir: user.value?.idir_username,
+      login: user.value?.iat ? new Date(user.value?.iat * 1000).toISOString() : new Date().toISOString(),
       created: new Date().toISOString()
     }
 
@@ -36,4 +49,5 @@ const download = () => {
   link.click();
   URL.revokeObjectURL(url); // Clean up the URL object  
 };
+
 </script>
