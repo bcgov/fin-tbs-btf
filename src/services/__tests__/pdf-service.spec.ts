@@ -53,7 +53,7 @@ describe('pdfService', () => {
     });
     const mockFiles = {
       length: 1,
-      item: (index: number) => mockFile,
+      item: () => mockFile,
       0: mockFile,
     } as unknown as FileList;
 
