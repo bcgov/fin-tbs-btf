@@ -4,6 +4,6 @@
 
 <template>
   
-  <h1>You are not authorized to access the application.</h1>
+  <h5>You are not authorized to access the application.</h5>
 
 </template>
