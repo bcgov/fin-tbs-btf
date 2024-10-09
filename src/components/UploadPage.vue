@@ -1,68 +1,56 @@
 <template>
-  <v-row>
-    <v-col class="d-flex justify-start">
-      <h5>Upload Page</h5>
-    </v-col>
-  </v-row>
   <v-row dense class="h-50">
-    <v-col class="d-flex justify-start"> drop zone here </v-col>
     <v-col class="d-inline-block h-100">
-      <h3>Uploaded Files</h3>
+      <h3>Files</h3>
       <v-card class="w-100 h-100">
         <v-card-text>
           <v-list class="w-100">
-            <v-list-item
+            <UploadedFileItem
               v-for="uploadedFile in uploadedFiles"
               :key="uploadedFile.uploadedFileId"
-              class="d-flex justify-start"
+              :uploadedFile="uploadedFile"
             >
-              <template v-slot:default>
-                <v-icon
-                  :icon="
-                    uploadedFile.validationErrors.length
-                      ? 'mdi-alert'
-                      : 'mdi-check'
-                  "
-                  :color="
-                    uploadedFile.validationErrors.length ? 'error' : 'success'
-                  "
-                ></v-icon>
-                {{ uploadedFile.file.name }}
-              </template>
-              <template v-slot:append>
-                <div class="ms-6">
-                  <v-btn
-                    icon="mdi-delete"
-                    size="x-small"
-                    @click="uploadedFilesStore.removeUploadedFile(uploadedFile)"
-                  ></v-btn>
-                </div>
-              </template>
-            </v-list-item>
+            </UploadedFileItem>
           </v-list>
         </v-card-text>
       </v-card>
+      <div class="d-flex justify-space-between mt-2">
+        <v-btn
+          class="btn-primary"
+          for="file-chooser"
+          @click="$refs.fileChooser?.click()"
+          >Upload a file</v-btn
+        >
+        <v-btn class="btn-secondary ms-2" @click="reset()">Clear</v-btn>
+        <v-file-input
+          id="file-chooser"
+          ref="fileChooser"
+          multiple
+          label="File input"
+          :hide-input="true"
+          :hide-detail="true"
+          prepend-icon="none"
+          accept="application/pdf"
+          @change="onFilesSelected"
+        />
+        <v-btn
+          class="btn-primary"
+          @click="saveExcel"
+          :disabled="uploadedFiles.length == 0 || hasValidationErrors"
+          >Download excel</v-btn
+        >
+      </div>
     </v-col>
-  </v-row>
-  <v-row>
-    <v-col>
-      <v-file-input
-        multiple
-        label="File input"
-        accept="application/pdf"
-        @change="onFilesSelected"
-      />
-      <v-btn class="btn-secondary" @click="saveExcel">Download excel</v-btn>
-    </v-col>
+    <v-col> </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
+import UploadedFileItem from "./UploadedFileItem.vue";
 import { useAuthStore } from "../stores/auth-store";
 import { useUploadedFilesStore } from "../stores/uploaded-files-store";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
-import pdfService from "../services/pdf-service";
+import { ref, computed } from "vue";
 import excelService from "../services/excel-service";
 import { excelColumnDefaults, excelColumnOrder } from "../constants";
 
@@ -72,21 +60,32 @@ const authStore = useAuthStore();
 const { uploadedFiles } = storeToRefs(uploadedFilesStore);
 const { user } = storeToRefs(authStore);
 
-// Store extracted form data from PDFs
-const extractedData = ref<any[]>([]);
+const hasValidationErrors = computed<boolean>(() => {
+  return (
+    uploadedFiles.value.filter((f) => f.validationErrors?.length).length > 0
+  );
+});
 
-/** Event handler for file input */
+function reset() {
+  uploadedFilesStore.reset();
+}
+
 const onFilesSelected = async (event: Event) => {
   const files = (event.target as HTMLInputElement).files;
   if (files) {
-    const data = await pdfService.handleFiles(files);
-    for (const d of data) extractedData.value.push(d);
+    uploadedFilesStore.addFileList(files);
   }
 };
 
 /** Event handler to save the extracted data to Excel */
 const saveExcel = async () => {
   try {
+    // combined the parsed data from all valid PDFs
+    // into one array
+    const extractedData = uploadedFiles.value
+      .filter((f) => f.parsedData && !f.validationErrors.length)
+      .map((f) => f.parsedData);
+
     const auditDetails = {
       idir: user.value?.idir_username,
       loginDate: user.value?.iat
@@ -95,7 +94,7 @@ const saveExcel = async () => {
       createdDate: new Date().toISOString(),
     };
     await excelService.exportToExcel(
-      extractedData.value,
+      extractedData,
       excelColumnOrder,
       excelColumnDefaults,
       auditDetails,
