@@ -32,7 +32,5 @@
     "vitest": "^2.1.2",
     "vue-tsc": "^2.1.6"
   },
-  "prettier": {
-    "singleQuote": true
-  }
+  "prettier": {}
 }

@@ -18,11 +18,12 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '../stores/auth-store';
-import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
-import pdfService from '../services/pdf-service';
-import excelService from '../services/excel-service';
+import { useAuthStore } from "../stores/auth-store";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
+import pdfService from "../services/pdf-service";
+import excelService from "../services/excel-service";
+import { excelColumnDefaults, excelColumnOrder } from "../constants";
 
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
@@ -42,57 +43,6 @@ const onFilesSelected = async (event: Event) => {
 /** Event handler to save the extracted data to Excel */
 const saveExcel = async () => {
   try {
-    const columnOrder = [
-      'submissionId',
-      'CONTROL_NUM',
-      'STATUS_DESCR',
-      'EFFECTIVE_DT',
-      'LAST_ACTED_ON_AUDIT_TS',
-      'NEXT_TO_ACT_LAST_NAME',
-      'NEXT_TO_ACT_FIRST_NAME',
-      'FROM_CLIENT_CD',
-      'FROM_CLIENT_NAME',
-      'TO_CLIENT_CD',
-      'TO_CLIENT_NAME',
-      'FISCAL_YEAR',
-      'TRANSFER_REASON',
-      'BUDGETR_GROSS_OPERATING_AMT',
-      'BUDGET_GROSS_OPERATING_AMT',
-      'BUDGET1_GROSS_OPERATING_AMT',
-      'BUDGET2_GROSS_OPERATING_AMT',
-      'BUDGETR_RECOV_OPERATING_AMT',
-      'BUDGET_RECOV_OPERATING_AMT',
-      'BUDGET1_RECOV_OPERATING_AMT',
-      'BUDGET2_RECOV_OPERATING_AMT',
-      'BUDGETR_CAPITAL_AMT',
-      'BUDGET_CAPITAL_AMT',
-      'BUDGET1_CAPITAL_AMT',
-      'BUDGET2_CAPITAL_AMT',
-      'BUDGETR_FTE_CNT',
-      'BUDGET_FTE_CNT',
-      'BUDGET1_FTE_CNT',
-      'BUDGET2_FTE_CNT',
-      'BUDGETR_RECEIPT_FIN_AMT',
-      'BUDGET_RECEIPT_FIN_AMT',
-      'BUDGET1_RECEIPT_FIN_AMT',
-      'BUDGET2_RECEIPT_FIN_AMT',
-      'BUDGETR_DISBURSE_FIN_AMT',
-      'BUDGET_DISBURSE_FIN_AMT',
-      'BUDGET1_DISBURSE_FIN_AMT',
-      'BUDGET2_DISBURSE_FIN_AMT',
-      'BUDGETR_STOBS_REV_AMT',
-      'BUDGET_STOBS_REV_AMT',
-      'BUDGET1_STOBS_REV_AMT',
-      'BUDGET2_STOBS_REV_AMT',
-      'BUDGETR_COMMISSION_AMT',
-      'BUDGET_COMMISSION_AMT',
-      'BUDGET1_COMMISSION_AMT',
-      'BUDGET2_COMMISSION_AMT',
-      'BUDGETR_DOUBTFUL_ACCT_AMT',
-      'BUDGET_DOUBTFUL_ACCT_AMT',
-      'BUDGET1_DOUBTFUL_ACCT_AMT',
-      'BUDGET2_DOUBTFUL_ACCT_AMT',
-    ];
     const auditDetails = {
       idir: user.value?.idir_username,
       loginDate: user.value?.iat
@@ -102,12 +52,13 @@ const saveExcel = async () => {
     };
     await excelService.exportToExcel(
       extractedData.value,
-      columnOrder,
+      excelColumnOrder,
+      excelColumnDefaults,
       auditDetails,
     );
-    console.log('Excel file has been created successfully!');
+    console.log("Excel file has been created successfully!");
   } catch (error) {
-    console.error('Error exporting to Excel:', error);
+    console.error("Error exporting to Excel:", error);
   }
 };
 </script>

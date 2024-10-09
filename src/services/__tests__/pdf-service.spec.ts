@@ -1,21 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import pdfService from '../pdf-service';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import pdfService from "../pdf-service";
 
 // Mock the web worker because "Web Workers are not supported in this environment."
-vi.mock('../../workers/pdfjsWorker', () => ({}));
+vi.mock("../../workers/pdfjsWorker", () => ({}));
 
 // Mock the necessary parts of pdfjs
 const mockGetDocument = vi.fn();
-vi.mock('pdfjs-dist', () => ({
+vi.mock("pdfjs-dist", () => ({
   getDocument: (...args: any) => mockGetDocument(...args),
 }));
 
-describe('pdfService', () => {
+describe("pdfService", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
-  it('should handle parsing PDF and extracting form fields', async () => {
+  it("should handle parsing PDF and extracting form fields", async () => {
     const mockArrayBuffer = new ArrayBuffer(8);
 
     // Mock getDocument and PDF document
@@ -23,8 +23,8 @@ describe('pdfService', () => {
       numPages: 2,
       getPage: vi.fn().mockResolvedValue({
         getAnnotations: vi.fn().mockResolvedValue([
-          { fieldName: 'field1', fieldValue: 'value1', fieldType: 'Tx' },
-          { fieldName: 'field2', fieldValue: 'value2', fieldType: 'Tx' },
+          { fieldName: "field1", fieldValue: "value1", fieldType: "Tx" },
+          { fieldName: "field2", fieldValue: "value2", fieldType: "Tx" },
         ]),
       }),
     };
@@ -37,8 +37,8 @@ describe('pdfService', () => {
 
     // Assertions
     expect(fields).toEqual({
-      field1: 'value1',
-      field2: 'value2',
+      field1: "value1",
+      field2: "value2",
     });
 
     expect(mockGetDocument).toHaveBeenCalledWith({ data: mockArrayBuffer });
@@ -46,10 +46,10 @@ describe('pdfService', () => {
     expect(mockPdfDoc.getPage).toHaveBeenCalledWith(2);
   });
 
-  it('should handle multiple files', async () => {
+  it("should handle multiple files", async () => {
     // Mock FileList and File
-    const mockFile = new File(['%PDF'], 'mock.pdf', {
-      type: 'application/pdf',
+    const mockFile = new File(["%PDF"], "mock.pdf", {
+      type: "application/pdf",
     });
     const mockFiles = {
       length: 1,
@@ -68,7 +68,7 @@ describe('pdfService', () => {
         getAnnotations: vi
           .fn()
           .mockResolvedValue([
-            { fieldName: 'field1', fieldValue: 'value1', fieldType: 'Tx' },
+            { fieldName: "field1", fieldValue: "value1", fieldType: "Tx" },
           ]),
       }),
     };
@@ -82,7 +82,7 @@ describe('pdfService', () => {
     // Assertions
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
-      field1: 'value1',
+      field1: "value1",
     });
 
     expect(mockFile.arrayBuffer).toHaveBeenCalledTimes(1);
@@ -99,12 +99,12 @@ describe('pdfService', () => {
       getPage: vi.fn().mockResolvedValue({
         getAnnotations: vi.fn().mockResolvedValue([
           {
-            fieldName: 'dropdownField',
-            fieldValue: ['option2'], // The selected option's value
-            fieldType: 'Ch',
+            fieldName: "dropdownField",
+            fieldValue: ["option2"], // The selected option's value
+            fieldType: "Ch",
             options: [
-              { value: 'option1', displayValue: 'Option 1' },
-              { value: 'option2', displayValue: 'Option 2' },
+              { value: "option1", displayValue: "Option 1" },
+              { value: "option2", displayValue: "Option 2" },
             ],
           },
         ]),
@@ -119,14 +119,14 @@ describe('pdfService', () => {
 
     // Assertions: Ensure the correct option is selected
     expect(fields).toEqual({
-      dropdownField: 'Option 2', // This should match the displayValue of the selected option
+      dropdownField: "Option 2", // This should match the displayValue of the selected option
     });
 
     expect(mockGetDocument).toHaveBeenCalledWith({ data: mockArrayBuffer });
     expect(mockPdfDoc.getPage).toHaveBeenCalledWith(1);
   });
 
-  it('should handle empty choice', async () => {
+  it("should handle empty choice", async () => {
     const mockArrayBuffer = new ArrayBuffer(8);
 
     // Mock choice field annotation with options
@@ -135,12 +135,12 @@ describe('pdfService', () => {
       getPage: vi.fn().mockResolvedValue({
         getAnnotations: vi.fn().mockResolvedValue([
           {
-            fieldName: 'dropdownField',
-            fieldValue: '', // The selected option's value
-            fieldType: 'Ch',
+            fieldName: "dropdownField",
+            fieldValue: "", // The selected option's value
+            fieldType: "Ch",
             options: [
-              { value: 'option1', displayValue: 'Option 1' },
-              { value: 'option2', displayValue: 'Option 2' },
+              { value: "option1", displayValue: "Option 1" },
+              { value: "option2", displayValue: "Option 2" },
             ],
           },
         ]),
@@ -162,17 +162,17 @@ describe('pdfService', () => {
     expect(mockPdfDoc.getPage).toHaveBeenCalledWith(1);
   });
 
-  it('should handle error during PDF parsing', async () => {
+  it("should handle error during PDF parsing", async () => {
     const mockArrayBuffer = new ArrayBuffer(8);
 
     // Mock getDocument to throw an error
     mockGetDocument.mockReturnValue({
-      promise: Promise.reject(new Error('PDF parsing error')),
+      promise: Promise.reject(new Error("PDF parsing error")),
     });
 
     // Catch the error
     await expect(pdfService.parsePDF(mockArrayBuffer)).rejects.toThrow(
-      'PDF parsing error',
+      "PDF parsing error",
     );
   });
 });
