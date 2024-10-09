@@ -1,5 +1,5 @@
 import { TinyEmitter } from "tiny-emitter";
-import Router from "../routes";
+import { useRouter } from "vue-router";
 
 /*
 This service provides an interface that other components and services
@@ -48,7 +48,8 @@ export const NotificationService = {
   */
   goToErrorPage(message: string = DEFAULT_ERROR_PAGE_MESSAGE) {
     this.setErrorPageMessage(message);
-    Router.push("/error");
+    const router = useRouter();
+    router.push("/error");
   },
 
   /* 
@@ -63,7 +64,7 @@ export const NotificationService = {
       throw new Error(
         `Invalid notification severity '${
           notification?.severity
-        }'.  Expected one of [${Object.values(NotificationSeverity)}]`
+        }'.  Expected one of [${Object.values(NotificationSeverity)}]`,
       );
     }
     notificationEvents.emit(NOTIFICATION_EVENT, notification);
@@ -73,7 +74,7 @@ export const NotificationService = {
   pushNotificationError(
     message: string,
     title: string = "Error!",
-    timeoutMs: number = DEFAULT_TIMEOUT_MS
+    timeoutMs: number = DEFAULT_TIMEOUT_MS,
   ) {
     this.pushNotification({
       title: title,
@@ -87,7 +88,7 @@ export const NotificationService = {
   pushNotificationWarning(
     message: string,
     title: string = "Warning!",
-    timeoutMs: number = DEFAULT_TIMEOUT_MS
+    timeoutMs: number = DEFAULT_TIMEOUT_MS,
   ) {
     this.pushNotification({
       title: title,
@@ -101,7 +102,7 @@ export const NotificationService = {
   pushNotificationInfo(
     message: string,
     title: string | null = null,
-    timeoutMs: number = DEFAULT_TIMEOUT_MS
+    timeoutMs: number = DEFAULT_TIMEOUT_MS,
   ) {
     this.pushNotification({
       title: title,
@@ -114,7 +115,7 @@ export const NotificationService = {
   pushNotificationSuccess(
     message: string,
     title: string = "Success!",
-    timeoutMs: number = DEFAULT_TIMEOUT_MS
+    timeoutMs: number = DEFAULT_TIMEOUT_MS,
   ) {
     this.pushNotification({
       title: title,
