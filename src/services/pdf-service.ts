@@ -1,5 +1,5 @@
-import * as pdfjs from 'pdfjs-dist';
-import '../workers/pdfjsWorker';
+import * as pdfjs from "pdfjs-dist";
+import "../workers/pdfjsWorker";
 
 const pdfService = {
   /**
@@ -38,7 +38,7 @@ const pdfService = {
 
       return fieldsData;
     } catch (error) {
-      console.error('Error parsing PDF:', error);
+      console.error("Error parsing PDF:", error);
       throw error;
     }
   },
@@ -52,10 +52,15 @@ const pdfServicePrivate = {
    */
   extractFieldsFromAnnotations(annotations: any[], fieldsData: any): any {
     annotations.forEach((annotation) => {
-      if (annotation.hasOwnProperty('fieldName')) {
-        if (annotation.fieldType === 'Ch' && annotation.options) {
+      if (annotation.hasOwnProperty("fieldName")) {
+        if (annotation.fieldType === "Ch" && annotation.options) {
           // Dropdown field: Get the selected option's text
           const selectedOption = annotation.fieldValue[0];
+          if (annotation.fieldName == "FROM_CLIENT_NAME")
+            fieldsData["FROM_CLIENT_CD"] = selectedOption;
+          if (annotation.fieldName == "TO_CLIENT_NAME")
+            fieldsData["TO_CLIENT_CD"] = selectedOption;
+
           const dropdownText =
             annotation.options.find(
               (option: any) => option.value === selectedOption,
