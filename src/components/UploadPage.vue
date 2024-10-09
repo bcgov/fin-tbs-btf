@@ -50,7 +50,7 @@ import UploadedFileItem from "./UploadedFileItem.vue";
 import { useAuthStore } from "../stores/auth-store";
 import { useUploadedFilesStore } from "../stores/uploaded-files-store";
 import { storeToRefs } from "pinia";
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import excelService from "../services/excel-service";
 import { excelColumnDefaults, excelColumnOrder } from "../constants";
 
