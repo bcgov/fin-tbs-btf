@@ -7,7 +7,8 @@
     "serve": "vite",
     "build": "vue-tsc -b && vite build",
     "build-pr": "vue-tsc -b && vite build --mode pr",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@bcgov/bc-sans": "^2.1.0",
