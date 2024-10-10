@@ -17,13 +17,13 @@
       <div class="d-flex justify-space-between mt-2">
         <v-btn
           class="btn-primary"
-          for="file-chooser"
+          for="fileChooser"
           @click="$refs.fileChooser?.click()"
           >Upload a file</v-btn
         >
         <v-btn class="btn-secondary ms-2" @click="reset()">Clear</v-btn>
         <v-file-input
-          id="file-chooser"
+          id="fileChooser"
           ref="fileChooser"
           multiple
           label="File input"
@@ -50,7 +50,7 @@ import UploadedFileItem from "./UploadedFileItem.vue";
 import { useAuthStore } from "../stores/auth-store";
 import { useUploadedFilesStore } from "../stores/uploaded-files-store";
 import { storeToRefs } from "pinia";
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import excelService from "../services/excel-service";
 import { excelColumnDefaults, excelColumnOrder } from "../constants";
 
@@ -59,6 +59,7 @@ const authStore = useAuthStore();
 
 const { uploadedFiles } = storeToRefs(uploadedFilesStore);
 const { user } = storeToRefs(authStore);
+const fileChooser = ref<any>(null);
 
 const hasValidationErrors = computed<boolean>(() => {
   return (
@@ -71,10 +72,14 @@ function reset() {
 }
 
 const onFilesSelected = async (event: Event) => {
+  //start the parsing and validation process on the selected
+  //files
   const files = (event.target as HTMLInputElement).files;
   if (files) {
     uploadedFilesStore.addFileList(files);
   }
+  //clear all previously uploaded files
+  fileChooser.value?.reset();
 };
 
 /** Event handler to save the extracted data to Excel */
