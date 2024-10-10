@@ -30,9 +30,9 @@ describe("excelService", () => {
     const date = new Date(2024, 1, 2, 3, 4, 5);
     vi.setSystemTime(date);
 
-    const extractedData = [
-      { submissionId: "123", BUDGET2_DOUBTFUL_ACCT_AMT: 500 },
-      { submissionId: "124", BUDGET2_DOUBTFUL_ACCT_AMT: 600 },
+    const extractedData: Record<string, string>[] = [
+      { submissionId: "123", BUDGET2_DOUBTFUL_ACCT_AMT: "500" },
+      { submissionId: "124", BUDGET2_DOUBTFUL_ACCT_AMT: "600" },
     ];
 
     const columnOrder = ["submissionId", "BUDGET2_DOUBTFUL_ACCT_AMT"];
@@ -69,24 +69,37 @@ describe("excelService", () => {
       [
         {
           submissionId: "N/A", // test defualt to N/A
-          BUDGET2_DOUBTFUL_ACCT_AMT: 500,
+          BUDGET2_DOUBTFUL_ACCT_AMT: "500",
           STATUS: "Pending", //test default
         },
         {
           submissionId: "N/A",
-          BUDGET2_DOUBTFUL_ACCT_AMT: 600,
+          BUDGET2_DOUBTFUL_ACCT_AMT: "600",
           STATUS: "Pending",
         },
       ],
       { header: columnOrder },
     );
-    expect(mockXlsxJsonToSheet).toHaveBeenNthCalledWith(2, [
+    expect(mockXlsxJsonToSheet).toHaveBeenNthCalledWith(
+      2,
+      [
+        {
+          Label: "createdDate",
+          Value: "2024-10-01T12:34:56Z",
+        },
+        {
+          Label: "loginDate",
+          Value: "2024-10-01T08:00:00Z",
+        },
+        {
+          Label: "idir",
+          Value: "JDoe123",
+        },
+      ],
       {
-        "Created/Modified Date": "2024-10-01T12:34:56Z",
-        IDIR: "JDoe123",
-        "Login Date": "2024-10-01T08:00:00Z",
+        header: ["Label", "Value"],
       },
-    ]);
+    );
 
     // Verify that the book_append_sheet method is called twice
     expect(mockXlsxBookAppendSheet).toHaveBeenCalledTimes(2); //DATA sheet, and again for AUDIT sheet
