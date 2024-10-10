@@ -15,7 +15,6 @@
     "@bcgov/bc-sans": "^2.1.0",
     "@braintree/sanitize-url": "^7.1.0",
     "@mdi/font": "^7.4.47",
-    "dropzone": "^6.0.0-beta.2",
     "fin-tbs-btf-frontend": "file:",
     "keycloak-js": "^25.0.6",
     "pdfjs-dist": "^4.7.76",
