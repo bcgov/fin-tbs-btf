@@ -2,11 +2,12 @@ import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
 import { ref } from "vue";
 import PdfService from "../services/pdf-service";
+import { pdfFields } from "../constants";
 
 export type UploadedFile = {
   uploadedFileId: string;
   file: File;
-  parsedData?: any;
+  parsedData: Record<string, string>;
   validationErrors: any;
   isLoading: any;
 };
@@ -22,7 +23,7 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
     const uploadedFile: UploadedFile = {
       uploadedFileId: uuidv4(),
       file: file,
-      parsedData: undefined,
+      parsedData: {},
       validationErrors: ref<Error[]>([]),
       isLoading: ref<boolean>(true),
     };
@@ -32,7 +33,7 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
       //error class yet-to - be defined) if any problems occur.
       //Until the method behaves this way, try to detect an a failed parse
       //right here and throw an error.
-      uploadedFile.parsedData = await PdfService.parsePDF(file);
+      uploadedFile.parsedData = await PdfService.parsePDF(file, pdfFields);
       if (!Object.keys(uploadedFile.parsedData).length) {
         throw new Error("Invalid PDF");
       }
