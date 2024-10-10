@@ -1,11 +1,5 @@
 import * as XLSX from "xlsx";
 
-interface Audit {
-  createdDate: string;
-  loginDate: string;
-  idir: string;
-}
-
 const excelService = {
   /**
    * Function to export extracted form data to an Excel file.
@@ -14,15 +8,15 @@ const excelService = {
    * @param columnOrder - The order of columns to be used in the Excel file
    */
   async exportToExcel(
-    extractedData: any[],
+    extractedData: Record<string, string>[],
     columnOrder: string[],
     columnDefaults: Record<string, string>,
-    audit: Audit,
+    auditData: Record<string, string>,
   ) {
     try {
       // Each row only needs the information from the columnOrder, nothing else
-      const formattedData = extractedData.map((data: any) => {
-        const rowData: any = {};
+      const formattedData = extractedData.map((data) => {
+        const rowData: Record<string, string> = {};
         columnOrder.forEach((title) => {
           rowData[title] = data[title] || "";
         });
@@ -59,16 +53,14 @@ const excelService = {
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "DATA");
 
-      // Generate the audit worksheet
-      const auditData = [
-        {
-          "Created/Modified Date": audit.createdDate,
-          IDIR: audit.idir,
-          "Login Date": audit.loginDate,
-        },
-      ];
-      const auditWorksheet = XLSX.utils.json_to_sheet(auditData);
-      auditWorksheet["!cols"] = [{ wch: 25 }, { wch: 15 }, { wch: 25 }];
+      // Convert auditData object into an array of { Label, Value } objects
+      const formattedAuditData = Object.entries(auditData).map(
+        ([key, value]) => ({ Label: key, Value: value }),
+      );
+      const auditWorksheet = XLSX.utils.json_to_sheet(formattedAuditData, {
+        header: ["Label", "Value"],
+      });
+      auditWorksheet["!cols"] = [{ wch: 15 }, { wch: 25 }];
       XLSX.utils.book_append_sheet(workbook, auditWorksheet, "METADATA");
 
       // Download the Excel file
