@@ -38,6 +38,15 @@
             </v-list>
           </v-card-text>
         </v-card>
+        <v-alert
+          v-if="hasValidationErrors"
+          title="Invalid files"
+          text="Please remove the invalid files"
+          color="error"
+          icon="mdi-alert-circle"
+          class="mt-2"
+        ></v-alert>
+
         <div class="d-flex justify-space-between mt-2">
           <v-btn
             class="btn-primary"
