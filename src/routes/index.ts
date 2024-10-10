@@ -43,6 +43,7 @@ router.beforeEach(async (to, _from, next) => {
   await authStore.init();
   if (to.meta.requiresAuth) {
     if (authStore.isAuthorized) {
+      console.log("proceeding to route " + to);
       next();
       return;
     } else {
