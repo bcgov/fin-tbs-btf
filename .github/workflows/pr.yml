@@ -25,6 +25,7 @@ jobs:
           cache: 'npm'
       - name: UT
         run: |
+          npm ci
           npm run test
 
   build-and-deploy:
