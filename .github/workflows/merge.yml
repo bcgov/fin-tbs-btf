@@ -5,15 +5,13 @@ on:
     workflow_dispatch:
 
 concurrency:
-  # Do not interrupt previous workflows
   group: ${{ github.workflow }}
-  cancel-in-progress: false
 
 permissions:
   contents: write
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-22.04
+  build-deploy-test:
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
@@ -21,7 +19,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - name: Install Dependencies and Build For Production🔧
+      - name: Install Dependencies and Build For TEST🔧
         env:
           BASE: /fin-tbs-btf/test/
         run: |
@@ -32,6 +30,8 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.6.4
         with:
           folder: dist # The folder the action should deploy.
-          clean-exclude: pr-preview/
+          clean-exclude: |
+            pr-preview/
+            test/
           force: false
           target-folder: test
