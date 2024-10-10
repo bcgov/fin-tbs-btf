@@ -157,11 +157,14 @@ const saveExcel = async () => {
       .map((f) => f.parsedData);
 
     const auditDetails = {
-      idir: user.value?.idir_username,
-      loginDate: user.value?.iat
+      IDIR: user.value?.idir_username,
+      Email: user.value?.email,
+      Name: user.value?.name,
+      "Login Date": user.value?.iat
         ? new Date(user.value?.iat * 1000).toISOString()
         : new Date().toISOString(),
-      createdDate: new Date().toISOString(),
+      "File Created": new Date().toISOString(),
+      "# PDFs": extractedData.length.toString(),
     };
     await excelService.exportToExcel(
       extractedData,

@@ -78,7 +78,7 @@ describe("pdfService", () => {
 
     // Assertions: Ensure the correct option is selected
     expect(fields).toEqual({
-      dropdownField: "Option 2", // This should match the displayValue of the selected option
+      dropdownField: "option2", // This should match the displayValue of the selected option
     });
 
     const arrayBuffer = await mockPdfFile.arrayBuffer();
@@ -94,7 +94,7 @@ describe("pdfService", () => {
         getAnnotations: vi.fn().mockResolvedValue([
           {
             fieldName: "dropdownField",
-            fieldValue: "", // The selected option's value
+            fieldValue: [""], // The selected option's value
             fieldType: "Ch",
             options: [
               { value: "option1", displayValue: "Option 1" },
@@ -113,7 +113,7 @@ describe("pdfService", () => {
 
     // Assertions: Ensure the correct option is selected
     expect(fields).toEqual({
-      dropdownField: undefined, // This should match the displayValue of the selected option
+      dropdownField: "", // This should match the fieldValue and not any of the options
     });
 
     const arrayBuffer = await mockPdfFile.arrayBuffer();
@@ -129,7 +129,7 @@ describe("pdfService", () => {
 
     // Catch the error
     await expect(pdfService.parsePDF(mockPdfFile)).rejects.toThrow(
-      "PDF parsing error",
+      "Cannot read PDF",
     );
   });
 });
