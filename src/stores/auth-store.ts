@@ -20,7 +20,7 @@ export const useAuthStore = defineStore("authStore", () => {
   const user = ref<any>(undefined);
 
   const init = async (
-    forceLoginIfNotAuthenticated: boolean = false
+    forceLoginIfNotAuthenticated: boolean = false,
   ): Promise<Keycloak | undefined> => {
     if (keycloak?.authenticated) {
       return keycloak;
@@ -37,7 +37,7 @@ export const useAuthStore = defineStore("authStore", () => {
           })
           .catch(function () {
             console.error(
-              "Failed to refresh the token, or the session has expired"
+              "Failed to refresh the token, or the session has expired",
             );
             logout();
           });

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import DashboardPage from "../components/DashboardPage.vue";
-import Unauthorized from "../components/Unauthorized.vue";
+import LoginPage from "../components/LoginPage.vue";
+import UnauthorizedPage from "../components/UnauthorizedPage.vue";
 import UploadPage from "../components/UploadPage.vue";
 import { useAuthStore } from "../stores/auth-store";
 
@@ -9,12 +9,12 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      redirect: "dashboard",
+      redirect: "upload",
     },
     {
-      path: "/dashboard",
-      name: "dashboard",
-      component: DashboardPage,
+      path: "/login",
+      name: "login",
+      component: LoginPage,
       meta: {
         requiresAuth: false,
       },
@@ -30,7 +30,7 @@ const router = createRouter({
     {
       path: "/unauthorized",
       name: "unauthorized",
-      component: Unauthorized,
+      component: UnauthorizedPage,
       meta: {
         requiresAuth: false,
       },
@@ -40,28 +40,20 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore();
-  await authStore.init(to.meta.requiresAuth as boolean);
+  await authStore.init(); //to.meta.requiresAuth as boolean
   if (to.meta.requiresAuth) {
     if (authStore.isAuthorized) {
+      console.log("proceeding to route " + to);
       next();
       return;
     } else {
-      next("/unauthorized");
+      console.log("redirecting to login");
+      next("/login");
     }
   } else {
     console.log("open page");
     next();
   }
 });
-
-/*
-function isValidUser(keycloak: Keycloak | undefined) {
-  return (
-    keycloak?.authenticated &&
-    keycloak?.tokenParsed?.aud === "fin-tbs-btf-5747" &&
-    keycloak?.tokenParsed?.client_roles?.includes("fin-tbs-btf-admin")
-  );
-}
-*/
 
 export default router;
