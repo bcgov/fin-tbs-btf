@@ -6,7 +6,7 @@
           class="h-100 d-flex flex-column justify-center align-center"
         >
           <div>
-            <h2 class="mb-2">Log in</h2>
+            <h2 class="mb-2">Log In</h2>
             <v-btn class="btn-primary" @click="login()" v-if="!isAuthenticated"
               >Login with IDIR MFA</v-btn
             >
