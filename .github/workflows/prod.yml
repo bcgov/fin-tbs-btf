@@ -1,18 +1,9 @@
-name: Merge to main
+name: PROD Deploy
 on:
-    push:
-      branches: [main]
-    workflow_dispatch:
+  workflow_dispatch:
 
-concurrency:
-  # Do not interrupt previous workflows
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
-
-permissions:
-  contents: write
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout 🛎️
@@ -23,10 +14,10 @@ jobs:
           cache: 'npm'
       - name: Install Dependencies and Build For Production🔧
         env:
-          BASE: /fin-tbs-btf/test/
+          BASE: /fin-tbs-btf
         run: |
           npm ci
-          npm run build-test
+          npm run build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.6.4
@@ -34,4 +25,3 @@ jobs:
           folder: dist # The folder the action should deploy.
           clean-exclude: pr-preview/
           force: false
-          target-folder: test
