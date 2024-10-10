@@ -15,6 +15,10 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
   const uploadedFiles = ref<UploadedFile[]>([]);
 
   const addFile = async (file: File): Promise<void> => {
+    if (fileExists(file)) {
+      //ignore duplicate files
+      return;
+    }
     const uploadedFile: UploadedFile = {
       uploadedFileId: uuidv4(),
       file: file,
@@ -48,6 +52,17 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
   const removeUploadedFile = (uploadedFile: UploadedFile): void => {
     uploadedFiles.value = uploadedFiles.value.filter(
       (uf: UploadedFile) => uf?.uploadedFileId != uploadedFile?.uploadedFileId,
+    );
+  };
+
+  const fileExists = (file: File): boolean => {
+    return (
+      uploadedFiles.value.filter(
+        (u) =>
+          u.file.lastModified == file.lastModified &&
+          u.file.size == file.size &&
+          u.file.name == file.name,
+      ).length > 0
     );
   };
 

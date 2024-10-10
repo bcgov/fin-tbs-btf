@@ -22,10 +22,17 @@
     <template v-slot:append>
       <div class="ms-2">
         <v-btn
-          icon="mdi-delete"
-          size="x-small"
+          variant="plain"
+          class="btn-icon"
           @click="uploadedFilesStore.removeUploadedFile(uploadedFile)"
-        ></v-btn>
+        >
+          <v-icon
+            icon="mdi-close-thick"
+            class="px-0"
+            style="min-width: 0px"
+            size="large"
+          ></v-icon>
+        </v-btn>
       </div>
     </template>
   </v-list-item>
@@ -48,3 +55,9 @@ defineProps<{
   uploadedFile: UploadedFile;
 }>();
 </script>
+
+<style>
+.v-list-item {
+  min-height: 0px !important;
+}
+</style>
