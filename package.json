@@ -7,22 +7,27 @@
     "serve": "vite",
     "build": "vue-tsc -b && vite build",
     "build-pr": "vue-tsc -b && vite build --mode pr",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@bcgov/bc-sans": "^2.1.0",
     "@braintree/sanitize-url": "^7.1.0",
+    "@mdi/font": "^7.4.47",
+    "dropzone": "^6.0.0-beta.2",
     "fin-tbs-btf-frontend": "file:",
     "keycloak-js": "^25.0.6",
     "pdfjs-dist": "^4.7.76",
     "pinia": "^2.2.4",
     "tiny-emitter": "^2.1.0",
+    "uuid": "^10.0.0",
     "vue": "^3.5.9",
     "vue-router": "^4.4.5",
     "vuetify": "^3.7.2",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "prettier": "^3.3.3",
     "sass": "^1.79.4",

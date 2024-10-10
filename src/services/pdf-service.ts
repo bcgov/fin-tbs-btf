@@ -3,29 +3,13 @@ import "../workers/pdfjsWorker";
 
 const pdfService = {
   /**
-   * Handle the file input and parse each PDF to extract form fields.
-   * @param files - The files selected by the user (multiple PDFs).
-   * @returns - Returns an array of extracted data for each PDF.
-   */
-  async handleFiles(files: FileList): Promise<any[]> {
-    const extractedData: any[] = [];
-
-    for (const file of Array.from(files)) {
-      const arrayBuffer = await file.arrayBuffer();
-      const fields = await this.parsePDF(arrayBuffer);
-      extractedData.push(fields);
-    }
-
-    return extractedData;
-  },
-
-  /**
    * Parse a PDF file and extract the form fields.
-   * @param arrayBuffer - The PDF file as an array buffer.
+   * @param arrayBuffer - The PDF file
    * @returns - Returns an object containing extracted form fields.
    */
-  async parsePDF(arrayBuffer: ArrayBuffer): Promise<any> {
+  async parsePDF(file: File): Promise<any> {
     try {
+      const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await pdfjs.getDocument({ data: arrayBuffer }).promise;
       const fieldsData: any = {};
 
