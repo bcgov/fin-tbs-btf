@@ -1,31 +1,30 @@
 <template>
-  <v-app >
+  <v-app>
     <MsieBanner v-if="isIE" />
     <Header />
     <SnackBar />
     <v-main fluid class="mx-4 my-4">
-      <RouterView />
+      <v-container class="h-100">
+        <RouterView />
+      </v-container>
     </v-main>
   </v-app>
-
-
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import { computed } from 'vue';
-import Header from './components/Header.vue';
-import MsieBanner from './components/MsieBanner.vue';
-import SnackBar from './components/SnackBar.vue';
+import { RouterView } from "vue-router";
+import { computed } from "vue";
+import Header from "./components/Header.vue";
+import MsieBanner from "./components/MsieBanner.vue";
+import SnackBar from "./components/SnackBar.vue";
 
 const isIE = computed(() => {
-  return /Trident\/|MSIE/.test(window.navigator.userAgent); 
-})
-
+  return /Trident\/|MSIE/.test(window.navigator.userAgent);
+});
 </script>
 
 <style>
-@import '@bcgov/bc-sans/css/BCSans.css';
+@import "@bcgov/bc-sans/css/BCSans.css";
 
 #app {
   max-width: 100% !important;
@@ -53,7 +52,7 @@ a:hover {
 }
 
 .v-application {
-  font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif !important;
+  font-family: "BCSans", "Noto Sans", Verdana, Arial, sans-serif !important;
 }
 
 .v-card--flat {
@@ -76,6 +75,11 @@ h1 {
   text-transform: none !important;
 }
 
+.v-btn.btn-icon {
+  min-width: 0px !important;
+  padding: 4px !important;
+}
+
 .v-btn.btn-primary {
   background-color: #053662 !important;
   color: #ffffff !important;
@@ -94,6 +98,11 @@ h1 {
 
 .v-btn.btn-secondary:hover {
   background-color: #edebe9 !important;
+}
+.v-btn.btn-secondary:disabled {
+  background-color: #edebe9 !important;
+  color: #aaaaaa !important;
+  border: none !important;
 }
 
 .v-alert .v-icon {
