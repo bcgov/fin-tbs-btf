@@ -28,7 +28,7 @@ jobs:
           npm ci
           npm run test
 
-  build-and-deploy:
+  build-deploy-pr:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout 🛎️
