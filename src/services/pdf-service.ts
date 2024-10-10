@@ -7,12 +7,12 @@ const pdfService = {
   /**
    * Parse a PDF file and extract the form fields.
    * @param file - The PDF file
-   * @param expectedFields - The minimum expected fields to be considered valid
+   * @param expectedFields - (optional) The minimum expected fields to be considered valid
    * @returns - Returns an object containing extracted form fields.
    */
   async parsePDF(
     file: File,
-    expectedFields: string[],
+    expectedFields: string[] = [],
   ): Promise<Record<string, string>> {
     const fieldsData: Record<string, string> = {};
 
