@@ -1,13 +1,17 @@
 <template>
-<v-app-bar
-    absolute    
-    class="d-flex justify-center ps-4 pe-4"
-  >
-    <RouterLink to="/dashboard"><img src="../assets/images/bc-gov-logo-light.png" height="60" class="mr-2"></RouterLink >
-    <RouterLink to="/upload" class="text-primary"><h3>TBS BTF</h3></RouterLink >
+  <v-app-bar absolute class="d-flex justify-center ps-4 pe-4">
+    <RouterLink to="/"
+      ><img
+        src="../assets/images/bc-gov-logo-light.png"
+        height="60"
+        class="mr-2"
+    /></RouterLink>
+    <RouterLink to="/upload" class="text-primary"
+      ><h3>Treasury Board Staff - Budget Transfer Form</h3></RouterLink
+    >
 
     <v-spacer />
-    
+
     <div v-if="user">
       <v-icon icon="mdi-account" size="small" />
       {{ user?.display_name }}
@@ -16,7 +20,7 @@
     <v-btn
       class="btn-link ms-2"
       v-if="isAuthenticated"
-      @click="authStore.logout()"      
+      @click="authStore.logout()"
     >
       Logout
     </v-btn>
@@ -26,19 +30,20 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '../stores/auth-store';
-import { watch } from 'vue'
-import { storeToRefs } from 'pinia';
+import { useAuthStore } from "../stores/auth-store";
+import { watch } from "vue";
+import { storeToRefs } from "pinia";
 
 const authStore = useAuthStore();
-const {
-  user, isAuthenticated
-} = storeToRefs(authStore);
+const { user, isAuthenticated } = storeToRefs(authStore);
 
-watch(isAuthenticated, () => {
-  console.log(`isAuthenticated ${isAuthenticated.value}`)
-}, {immediate: true})
-
+watch(
+  isAuthenticated,
+  () => {
+    console.log(`isAuthenticated ${isAuthenticated.value}`);
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="css">
