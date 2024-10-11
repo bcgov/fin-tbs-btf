@@ -7,11 +7,8 @@
         >
           <div>
             <h2 class="mb-2">Log In</h2>
-            <v-btn class="btn-primary" @click="login()" v-if="!isAuthenticated"
+            <v-btn class="btn-primary" @click="login()"
               >Login with IDIR MFA</v-btn
-            >
-            <v-btn class="btn-primary" to="upload" v-if="isAuthenticated"
-              >Upload files</v-btn
             >
           </div>
         </v-card-text>
@@ -23,12 +20,19 @@
 <script setup lang="ts">
 import { useAuthStore } from "../stores/auth-store";
 import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
 
 const login = () => {
-  authStore.init(true);
+  if (!isAuthenticated.value) {
+    authStore.init(true);
+  } else {
+    //already logged in, so bypass authentication and go directly into the app
+    router.push("/");
+  }
 };
 </script>
 
