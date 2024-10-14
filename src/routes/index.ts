@@ -35,6 +35,11 @@ const router = createRouter({
         requiresAuth: false,
       },
     },
+    {
+      path: "/:catchAll(.*)",
+      redirect: "/"
+    }
+
   ],
 });
 
