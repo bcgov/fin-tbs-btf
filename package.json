@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "serve": "vite",
+    "serve": "vite --host",
     "build": "vue-tsc -b && vite build",
     "build-pr": "vue-tsc -b && vite build --mode pr",
     "build-test": "vue-tsc -b && vite build --mode test",
