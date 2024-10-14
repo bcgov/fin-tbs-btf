@@ -1,6 +1,10 @@
 name: PROD Deploy
 on:
   workflow_dispatch:
+      inputs:
+        tag:
+          description: "The Tag to deploy, it would be the latest tagged version that you want to deploy from TEST to PROD."
+          required: true
 concurrency:
   group: ${{ github.workflow }}
 jobs:
@@ -16,6 +20,7 @@ jobs:
       - name: Install Dependencies and Build For Production🔧
         env:
           BASE: /fin-tbs-btf
+          VITE_APP_VERSION: ${{ github.event.inputs.tag }}
         run: |
           npm ci
           npm run build
