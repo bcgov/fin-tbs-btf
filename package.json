@@ -16,7 +16,7 @@
     "@braintree/sanitize-url": "^7.1.0",
     "@mdi/font": "^7.4.47",
     "fin-tbs-btf-frontend": "file:",
-    "keycloak-js": "^25.0.6",
+    "keycloak-js": "^26.0.0",
     "pdfjs-dist": "^4.7.76",
     "pinia": "^2.2.4",
     "tiny-emitter": "^2.1.0",
