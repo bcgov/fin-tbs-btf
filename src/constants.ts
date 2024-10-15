@@ -56,6 +56,7 @@ export const excelColumnOrder = [
  * wrong pdf, or the pdf has been modified in some way.
  */
 export const pdfFields = [
+  "CONTROL_NUM",
   "FROM_CLIENT_NAME",
   "TO_CLIENT_NAME",
   "FISCAL_YEAR",
@@ -99,7 +100,6 @@ export const pdfFields = [
 ];
 
 export const excelColumnDefaults: Record<string, string> = {
-  CONTROL_NUM: "",
   STATUS_DESCR: "",
   NEXT_TO_ACT_LAST_NAME: "Estimates",
   NEXT_TO_ACT_FIRST_NAME: "TBS",
