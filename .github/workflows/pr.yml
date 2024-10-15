@@ -42,6 +42,7 @@ jobs:
         env:
           BASE: /fin-tbs-btf/pr-preview/pr-${{github.event.number}}
           VITE_SSO_REDIRECT_URI: https://bcgov.github.io/fin-tbs-btf/pr-preview/pr-${{github.event.number}}
+          VITE_APP_VERSION: ${{ github.event.number }}-${{ github.run_number }}
         run: |
           npm ci
           npm run build-pr
