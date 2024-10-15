@@ -9,6 +9,7 @@
             <h2 class="mb-2">
               You are not authorized to access the application.
             </h2>
+            <p class="mb-2">If you require access, please contact Admin.</p>
             <v-btn class="btn-primary" @click="authStore.logout()">
               Logout
             </v-btn>
