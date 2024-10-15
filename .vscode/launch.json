@@ -20,12 +20,17 @@
       "type": "msedge",
       "request": "launch",
       "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}",
+      "webRoot": "${workspaceFolder}/src",
       "presentation": {
         "hidden": true,
         "group": "Browser",
         "order": 1
-      }
+      },
+      // This is a hack to get rid of some warnings
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
     }
   ],
   "compounds": [
