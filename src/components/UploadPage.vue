@@ -132,15 +132,15 @@ const initFileDropzone = () => {
 /* event handler for files uploaded via the "Upload File(s)" button*/
 const onFilesSelected = async (event: Event) => {
   const files: FileList | null = (event.target as HTMLInputElement).files;
-  ingestFiles(files);
+  await ingestFiles(files);
 
   //clear all previously uploaded files from the v-file-input
   fileChooser.value?.reset();
 };
 
-const ingestFiles = (files: FileList | null) => {
+const ingestFiles = async (files: FileList | null) => {
   if (files) {
-    uploadedFilesStore.addFileList(files);
+    await uploadedFilesStore.addFileList(files);
   }
 };
 

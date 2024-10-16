@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
 import { ref } from "vue";
-import PdfService from "../services/pdf-service";
 import { pdfFields } from "../constants";
+import PdfService from "../services/pdf-service";
 
 export type UploadedFile = {
   uploadedFileId: string;
@@ -28,25 +28,19 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
       isLoading: ref<boolean>(true),
     };
     uploadedFiles.value.push(uploadedFile);
+
     try {
-      //Todo: PdfService.parsePDF should throw PdfParseError (a new custom
-      //error class yet-to - be defined) if any problems occur.
-      //Until the method behaves this way, try to detect an a failed parse
-      //right here and throw an error.
       uploadedFile.parsedData = await PdfService.parsePDF(file, pdfFields);
-      if (!Object.keys(uploadedFile.parsedData).length) {
-        throw new Error("Invalid PDF");
-      }
     } catch (e) {
-      uploadedFile.validationErrors.value = [new Error("invalid pdf")];
+      uploadedFile.validationErrors.value = [new Error("Invalid PDF")];
     } finally {
       uploadedFile.isLoading.value = false;
     }
   };
 
-  const addFileList = (fileList: FileList): void => {
+  const addFileList = async (fileList: FileList): Promise<void> => {
     for (var i = 0; i < fileList.length; i++) {
-      addFile(fileList[i]);
+      await addFile(fileList[i]);
     }
   };
 
@@ -60,9 +54,9 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
     return (
       uploadedFiles.value.filter(
         (u) =>
-          u.file.lastModified == file.lastModified &&
-          u.file.size == file.size &&
-          u.file.name == file.name,
+          u.file?.lastModified == file?.lastModified &&
+          u.file?.size == file?.size &&
+          u.file?.name == file?.name,
       ).length > 0
     );
   };

@@ -1,7 +1,7 @@
 import * as pdfjs from "pdfjs-dist";
 import "../workers/pdfjsWorker";
 
-class PdfParseError extends Error {}
+export class PdfParseError extends Error {}
 
 const pdfService = {
   /**
