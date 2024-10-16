@@ -1,5 +1,5 @@
 import { createTestingPinia } from "@pinia/testing";
-import { fireEvent, render } from "@testing-library/vue";
+import { fireEvent, render, waitFor } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
@@ -149,7 +149,9 @@ describe("UploadPage", () => {
       //the file appears in the list on the screen
       const uploadedFile = await component.getByText(mockPdfFile.name);
       expect(uploadedFile).toBeInTheDocument();
-      expect(uploadedFile?.outerHTML).toContain("mdi-alert-circle"); //checkmark icon appears
+      await waitFor(() => {
+        expect(uploadedFile?.outerHTML).toContain("mdi-alert-circle"); //checkmark icon appears
+      });
 
       //alert indicating the uploaded file is invalid is visible on the screen
       const invalidFilesAlert = await component.getByText(
@@ -162,6 +164,41 @@ describe("UploadPage", () => {
         name: "Download Excel",
       });
       expect(downloadButton).toBeDisabled();
+    });
+  });
+
+  describe("When the 'clear' button is clicked", () => {
+    it("Removes all previously-added files", async () => {
+      vi.spyOn(PdfService, "parsePDF").mockImplementation(() => {
+        throw new PdfParseError("");
+      });
+
+      // Add a file via the dropzone
+      await fireEvent.drop(await component.getByText("Drop PDF files here"), {
+        dataTransfer: {
+          files: [mockPdfFile],
+        },
+      });
+
+      // Confirm that the file was uploaded
+      expect(await component.queryByText(mockPdfFile.name)).toBeInTheDocument();
+
+      // Click the 'Clear' button
+      const clearButton = await component.getByRole("button", {
+        name: "Clear",
+      });
+      await fireEvent.click(clearButton);
+
+      // Confirm that the clear button removes all files
+      expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
+      expect(
+        await component.queryByText(mockPdfFile.name),
+      ).not.toBeInTheDocument();
+
+      // Confirm that the dropzone title is visible
+      expect(
+        await component.getByText("Drop PDF files here"),
+      ).toBeInTheDocument();
     });
   });
 });

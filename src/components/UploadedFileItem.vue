@@ -49,9 +49,11 @@ import {
   UploadedFile,
   useUploadedFilesStore,
 } from "../stores/uploaded-files-store";
+import { watch, nextTick } from "vue";
+
 const uploadedFilesStore = useUploadedFilesStore();
 
-defineProps<{
+const props = defineProps<{
   uploadedFile: UploadedFile;
 }>();
 </script>
