@@ -49,6 +49,7 @@ import {
   UploadedFile,
   useUploadedFilesStore,
 } from "../stores/uploaded-files-store";
+
 const uploadedFilesStore = useUploadedFilesStore();
 
 defineProps<{

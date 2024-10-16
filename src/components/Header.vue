@@ -11,8 +11,8 @@
     >
 
     <v-spacer />
-    <div v-if="APP_VERSION" style="color: rgba(255, 255, 255, 0.87); ">
-      {{APP_VERSION }}
+    <div v-if="APP_VERSION" style="color: rgba(255, 255, 255, 0.87)">
+      {{ APP_VERSION }}
     </div>
     <div v-if="user">
       <v-icon icon="mdi-account" size="small" />
@@ -33,18 +33,11 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "../stores/auth-store";
-import { watch } from "vue";
+
 import { storeToRefs } from "pinia";
 const authStore = useAuthStore();
 const { user, isAuthenticated } = storeToRefs(authStore);
-const APP_VERSION=import.meta.env.VITE_APP_VERSION
-watch(
-  isAuthenticated,
-  () => {
-    console.log(`isAuthenticated ${isAuthenticated.value}`);
-  },
-  { immediate: true },
-);
+const APP_VERSION = import.meta.env.VITE_APP_VERSION;
 </script>
 
 <style lang="css">
