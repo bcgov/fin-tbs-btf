@@ -13,6 +13,7 @@ vi.mock("pdfjs-dist", () => ({
 const mockPdfFile = new File([""], "filename.pdf", {
   type: "application/pdf",
 });
+mockPdfFile.arrayBuffer = async () => new ArrayBuffer(0);
 
 describe("pdfService", () => {
   beforeEach(() => {
