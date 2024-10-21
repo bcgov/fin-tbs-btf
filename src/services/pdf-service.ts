@@ -8,6 +8,7 @@ import {
   ZoneId,
 } from "@js-joda/core";
 import { Locale } from "@js-joda/locale_en";
+import "@js-joda/timezone";
 
 export class PdfParseError extends Error {}
 
@@ -92,7 +93,7 @@ const pdfServicePrivate = {
   epocMilliToAccessDateStr(epocMilli: number): string {
     return ZonedDateTime.ofInstant(
       Instant.ofEpochMilli(epocMilli),
-      ZoneId.systemDefault(),
+      ZoneId.of("America/Vancouver"),
     )
       .format(
         DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a").withLocale(
