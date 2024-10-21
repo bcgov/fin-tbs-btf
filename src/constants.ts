@@ -100,7 +100,7 @@ export const pdfFields = [
 ];
 
 export const excelColumnDefaults: Record<string, string> = {
-  STATUS_DESCR: "",
+  STATUS_DESCR: "Processed",
   NEXT_TO_ACT_LAST_NAME: "Estimates",
   NEXT_TO_ACT_FIRST_NAME: "TBS",
   STOBS_DESCR: "",
