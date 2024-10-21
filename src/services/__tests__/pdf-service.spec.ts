@@ -12,6 +12,7 @@ vi.mock("pdfjs-dist", () => ({
 
 const mockPdfFile = new File([""], "filename.pdf", {
   type: "application/pdf",
+  lastModified: 1728505460209,
 });
 mockPdfFile.arrayBuffer = async () => new ArrayBuffer(0);
 
@@ -40,6 +41,7 @@ describe("pdfService", () => {
 
     // Assertions
     expect(fields).toEqual({
+      LAST_ACTED_ON_AUDIT_TS: "2024-10-09 01:24:20 PM",
       field1: "value1",
       field2: "value2",
     });
@@ -79,6 +81,7 @@ describe("pdfService", () => {
 
     // Assertions: Ensure the correct option is selected
     expect(fields).toEqual({
+      LAST_ACTED_ON_AUDIT_TS: "2024-10-09 01:24:20 PM",
       dropdownField: "option2", // This should match the displayValue of the selected option
     });
 
@@ -114,6 +117,7 @@ describe("pdfService", () => {
 
     // Assertions: Ensure the correct option is selected
     expect(fields).toEqual({
+      LAST_ACTED_ON_AUDIT_TS: "2024-10-09 01:24:20 PM",
       dropdownField: "", // This should match the fieldValue and not any of the options
     });
 
