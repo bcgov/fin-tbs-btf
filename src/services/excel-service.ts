@@ -1,3 +1,4 @@
+import { DateTimeFormatter, ZonedDateTime, ZoneId } from "@js-joda/core";
 import * as XLSX from "xlsx";
 
 const excelService = {
@@ -64,7 +65,9 @@ const excelService = {
       XLSX.utils.book_append_sheet(workbook, auditWorksheet, "METADATA");
 
       // Download the Excel file
-      const dateTime = excelServicePrivate.getDateTimeStr(new Date());
+      const dateTime = ZonedDateTime.now(ZoneId.systemDefault()).format(
+        DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"),
+      );
       XLSX.writeFile(workbook, `TBS_BTF_output_${dateTime}.xlsx`, {
         compression: true,
       });
@@ -72,19 +75,6 @@ const excelService = {
       console.error("Error creating Excel:", error);
       throw new Error("Failed to create Excel file");
     }
-  },
-};
-
-const excelServicePrivate = {
-  getDateTimeStr(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-    return timestamp;
   },
 };
 

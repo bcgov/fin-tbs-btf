@@ -1,5 +1,14 @@
 import * as pdfjs from "pdfjs-dist";
 import "../workers/pdfjsWorker";
+import "@js-joda/core";
+import {
+  DateTimeFormatter,
+  Instant,
+  ZonedDateTime,
+  ZoneId,
+} from "@js-joda/core";
+import { Locale } from "@js-joda/locale_en";
+import "@js-joda/timezone";
 
 export class PdfParseError extends Error {}
 
@@ -26,6 +35,9 @@ const pdfService = {
         const annotations = await page.getAnnotations();
         pdfServicePrivate.extractFieldsFromAnnotations(annotations, fieldsData);
       }
+
+      fieldsData.LAST_ACTED_ON_AUDIT_TS =
+        pdfServicePrivate.epocMilliToAccessDateStr(file.lastModified);
     } catch (error) {
       throw new PdfParseError("Cannot read PDF");
     }
@@ -75,6 +87,21 @@ const pdfServicePrivate = {
         }
       }
     });
+  },
+
+  /** Convert epocMilli (eg. from a file modified time) to a format for Microsoft Access. */
+  epocMilliToAccessDateStr(epocMilli: number): string {
+    return ZonedDateTime.ofInstant(
+      Instant.ofEpochMilli(epocMilli),
+      ZoneId.of("America/Vancouver"),
+    )
+      .format(
+        DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a").withLocale(
+          Locale.CANADA,
+        ),
+      )
+      .replace("a.m.", "AM")
+      .replace("p.m.", "PM");
   },
 };
 
