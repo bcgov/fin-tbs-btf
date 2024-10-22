@@ -16,13 +16,9 @@ const pdfService = {
   /**
    * Parse a PDF file and extract the form fields.
    * @param file - The PDF file
-   * @param expectedFields - (optional) The minimum expected fields to be considered valid
-   * @returns - Returns an object containing extracted form fields.
+   * @returns - Returns an object containing extracted form fields
    */
-  async parsePDF(
-    file: File,
-    expectedFields: string[] = [],
-  ): Promise<Record<string, string>> {
+  async parsePDF(file: File): Promise<Record<string, string>> {
     const fieldsData: Record<string, string> = {};
 
     try {
@@ -41,24 +37,29 @@ const pdfService = {
     } catch (error) {
       throw new PdfParseError("Cannot read PDF");
     }
-
-    //check if pdf has all the expected fields
-    const hasAllFields = expectedFields.every((v) =>
-      fieldsData.hasOwnProperty(v),
-    );
-    if (!hasAllFields) {
-      throw new PdfParseError("PDF missing required fields");
-    }
-
     return fieldsData;
+  },
+
+  /**
+   * Get the fields that are missing from a PDF.
+   * @param fieldsData - The output from parsePDF
+   * @param expectedFields - List of fields to check for existence
+   * @returns - A list of missing fields
+   */
+  getMissingFields(
+    fieldsData: Record<string, string>,
+    expectedFields: string[],
+  ): string[] {
+    const missing = expectedFields.filter((k) => !fieldsData.hasOwnProperty(k));
+    return missing;
   },
 };
 
 const pdfServicePrivate = {
   /**
-   * Extracts form fields from PDF annotations and adds them to fieldsData
-   * @param annotations - The annotations on the PDF page.
-   * @param fieldsData - The object to store the extracted form data.
+   * Extracts form fields from PDF annotations and adds them to fieldsData.
+   * @param annotations - The annotations on the PDF page
+   * @param fieldsData - The object to store the extracted form data
    */
   extractFieldsFromAnnotations(
     annotations: any[],
