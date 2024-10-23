@@ -57,18 +57,25 @@ describe("UploadPage", () => {
       const parsePdfSpy = vi
         .spyOn(PdfService, "parsePDF")
         .mockResolvedValue({});
+      const getMissingFieldsSpy = vi
+        .spyOn(PdfService, "getMissingFields")
+        .mockReturnValue([]);
       const fileInput: any = component.getByLabelText("File input");
       expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
       await fireEvent.change(fileInput, { target: { files: [mockPdfFile] } });
 
       //the file was parsed (no errors were found)
       expect(parsePdfSpy).toHaveBeenCalledTimes(1);
+      expect(getMissingFieldsSpy).toHaveBeenCalledTimes(2);
 
       //the file is added to the store
       expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
       expect(uploadedFilesStore.uploadedFiles[0].validationErrors.length).toBe(
         0,
       );
+      expect(
+        uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+      ).toBe(0);
 
       //the file appears in the list on the screen
       const uploadedFile = await component.getByText(mockPdfFile.name);
@@ -88,6 +95,9 @@ describe("UploadPage", () => {
       const parsePdfSpy = vi
         .spyOn(PdfService, "parsePDF")
         .mockResolvedValue({});
+      const getMissingFieldsSpy = vi
+        .spyOn(PdfService, "getMissingFields")
+        .mockReturnValue([]);
       const dropZone = component.getByText("Drop PDF files here");
 
       expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
@@ -99,12 +109,16 @@ describe("UploadPage", () => {
 
       //the file was parsed (no errors were found)
       expect(parsePdfSpy).toHaveBeenCalledTimes(1);
+      expect(getMissingFieldsSpy).toHaveBeenCalledTimes(2);
 
       //the file is added to the store
       expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
       expect(uploadedFilesStore.uploadedFiles[0].validationErrors.length).toBe(
         0,
       );
+      expect(
+        uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+      ).toBe(0);
       expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
 
       //the file appears in the list on the screen
@@ -121,49 +135,158 @@ describe("UploadPage", () => {
   });
 
   describe("When an invalid PDF file is dragged-and-dropped onto the 'dropzone'", () => {
-    it("The file is uploaded, parsed and shown on the page", async () => {
-      const parsePdfSpy = vi
-        .spyOn(PdfService, "parsePDF")
-        .mockImplementation(() => {
-          throw new PdfParseError("");
+    describe("If it's not a pdf", () => {
+      it("The file is uploaded, and error shown on the page", async () => {
+        const parsePdfSpy = vi
+          .spyOn(PdfService, "parsePDF")
+          .mockImplementation(() => {
+            throw new PdfParseError("");
+          });
+        const dropZone = component.getByText("Drop PDF files here");
+
+        expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
+        await fireEvent.drop(dropZone, {
+          dataTransfer: {
+            files: [mockPdfFile],
+          },
         });
-      const dropZone = component.getByText("Drop PDF files here");
 
-      expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
-      await fireEvent.drop(dropZone, {
-        dataTransfer: {
-          files: [mockPdfFile],
-        },
+        //the file was parsed (no errors were found)
+        expect(parsePdfSpy).toHaveBeenCalledTimes(1);
+
+        //the file is added to the store
+        expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
+        expect(
+          uploadedFilesStore.uploadedFiles[0].validationErrors.length,
+        ).toBe(1);
+        expect(
+          uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+        ).toBe(0);
+        expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
+
+        //the file appears in the list on the screen
+        const uploadedFile = await component.getByText(mockPdfFile.name);
+        expect(uploadedFile).toBeInTheDocument();
+        await waitFor(() => {
+          expect(uploadedFile?.outerHTML).toContain("mdi-alert-circle"); //alert icon appears
+        });
+
+        //alert indicating the uploaded file is invalid is visible on the screen
+        const invalidFilesAlert = await component.getByText(
+          "Please remove the invalid files",
+        );
+        expect(invalidFilesAlert).toBeInTheDocument();
+
+        //download button is disabled
+        const downloadButton = await component.getByRole("button", {
+          name: "Download Excel",
+        });
+        expect(downloadButton).toBeDisabled();
       });
+    });
+    describe("If it doesn't have the required fields", () => {
+      it("The file is uploaded, and error shown on the page", async () => {
+        const parsePdfSpy = vi
+          .spyOn(PdfService, "parsePDF")
+          .mockResolvedValue({});
+        const getMissingFieldsSpy = vi
+          .spyOn(PdfService, "getMissingFields")
+          .mockReturnValueOnce(["field1"]) //errors
+          .mockReturnValueOnce([]); //warnings
+        const dropZone = component.getByText("Drop PDF files here");
 
-      //the file was parsed (no errors were found)
-      expect(parsePdfSpy).toHaveBeenCalledTimes(1);
+        expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
+        await fireEvent.drop(dropZone, {
+          dataTransfer: {
+            files: [mockPdfFile],
+          },
+        });
 
-      //the file is added to the store
-      expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
-      expect(uploadedFilesStore.uploadedFiles[0].validationErrors.length).toBe(
-        1,
-      );
-      expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
+        //the file was parsed (no errors were found)
+        expect(parsePdfSpy).toHaveBeenCalledTimes(1);
+        expect(getMissingFieldsSpy).toHaveBeenCalledTimes(2);
 
-      //the file appears in the list on the screen
-      const uploadedFile = await component.getByText(mockPdfFile.name);
-      expect(uploadedFile).toBeInTheDocument();
-      await waitFor(() => {
-        expect(uploadedFile?.outerHTML).toContain("mdi-alert-circle"); //checkmark icon appears
+        //the file is added to the store
+        expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
+        expect(
+          uploadedFilesStore.uploadedFiles[0].validationErrors.length,
+        ).toBe(1);
+        expect(
+          uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+        ).toBe(0);
+        expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
+
+        //the file appears in the list on the screen
+        const uploadedFile = await component.getByText(mockPdfFile.name);
+        expect(uploadedFile).toBeInTheDocument();
+        await waitFor(() => {
+          expect(uploadedFile?.outerHTML).toContain("mdi-alert-circle"); //alert icon appears
+        });
+
+        //alert indicating the uploaded file is invalid is visible on the screen
+        const invalidFilesAlert = await component.getByText(
+          "Please remove the invalid files",
+        );
+        expect(invalidFilesAlert).toBeInTheDocument();
+
+        //download button is disabled
+        const downloadButton = await component.getByRole("button", {
+          name: "Download Excel",
+        });
+        expect(downloadButton).toBeDisabled();
       });
+    });
+    describe("If it doesn't have the optional fields", () => {
+      it("The file is uploaded, and error shown on the page", async () => {
+        const parsePdfSpy = vi
+          .spyOn(PdfService, "parsePDF")
+          .mockResolvedValue({});
+        const getMissingFieldsSpy = vi
+          .spyOn(PdfService, "getMissingFields")
+          .mockReturnValueOnce([]) //errors
+          .mockReturnValueOnce(["field1"]); //warnings
+        const dropZone = component.getByText("Drop PDF files here");
 
-      //alert indicating the uploaded file is invalid is visible on the screen
-      const invalidFilesAlert = await component.getByText(
-        "Please remove the invalid files",
-      );
-      expect(invalidFilesAlert).toBeInTheDocument();
+        expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
+        await fireEvent.drop(dropZone, {
+          dataTransfer: {
+            files: [mockPdfFile],
+          },
+        });
 
-      //download button is disabled
-      const downloadButton = await component.getByRole("button", {
-        name: "Download Excel",
+        //the file was parsed (no errors were found)
+        expect(parsePdfSpy).toHaveBeenCalledTimes(1);
+        expect(getMissingFieldsSpy).toHaveBeenCalledTimes(2);
+
+        //the file is added to the store
+        expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
+        expect(
+          uploadedFilesStore.uploadedFiles[0].validationErrors.length,
+        ).toBe(0);
+        expect(
+          uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+        ).toBe(1);
+        expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
+
+        //the file appears in the list on the screen
+        const uploadedFile = await component.getByText(mockPdfFile.name);
+        expect(uploadedFile).toBeInTheDocument();
+        await waitFor(() => {
+          expect(uploadedFile?.outerHTML).toContain("mdi-alert"); //warning icon appears
+        });
+
+        //alert indicating the uploaded file is invalid is visible on the screen
+        const invalidFilesAlert = await component.getByText(
+          "The remaining data from those files will be included in your download",
+        );
+        expect(invalidFilesAlert).toBeInTheDocument();
+
+        //download button is not disabled
+        const downloadButton = await component.getByRole("button", {
+          name: "Download Excel",
+        });
+        expect(downloadButton).not.toBeDisabled();
       });
-      expect(downloadButton).toBeDisabled();
     });
   });
 

@@ -13,11 +13,28 @@
         :icon="
           uploadedFile.validationErrors.length
             ? 'mdi-alert-circle'
-            : 'mdi-check'
+            : uploadedFile.validationWarnings.length
+              ? 'mdi-alert'
+              : 'mdi-check'
         "
-        :color="uploadedFile.validationErrors.length ? 'error' : 'success'"
+        :color="
+          uploadedFile.validationErrors.length
+            ? 'error'
+            : uploadedFile.validationWarnings.length
+              ? 'orange'
+              : 'success'
+        "
       ></v-icon>
-      {{ uploadedFile.file.name }}
+      {{ uploadedFile.file.name }}<br />
+      <div
+        v-if="
+          uploadedFile.validationWarnings.length &&
+          !uploadedFile.validationErrors.length
+        "
+        class="ml-10 text-orange"
+      >
+        PDF Missing fields: {{ uploadedFile.validationWarnings.join(", ") }}
+      </div>
     </template>
     <template v-slot:append>
       <div class="ms-2">

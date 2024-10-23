@@ -55,7 +55,7 @@ export const excelColumnOrder = [
  * If any of these fields don't exist, then it's the
  * wrong pdf, or the pdf has been modified in some way.
  */
-export const pdfFields = [
+export const pdfRequiredFields = [
   "CONTROL_NUM",
   "FROM_CLIENT_NAME",
   "TO_CLIENT_NAME",
@@ -98,6 +98,12 @@ export const pdfFields = [
   "BUDGET1_DOUBTFUL_ACCT_AMT",
   "BUDGET2_DOUBTFUL_ACCT_AMT",
 ];
+
+/**
+ * These are the optional fields to exist in the pdfs.
+ * Even if they aren't present, it's okay to continue.
+ */
+export const pdfOptionalFields = ["FROM_CLIENT_CD", "TO_CLIENT_CD"];
 
 export const excelColumnDefaults: Record<string, string> = {
   STATUS_DESCR: "Processed",

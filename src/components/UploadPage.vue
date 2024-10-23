@@ -39,8 +39,16 @@
           </v-card-text>
         </v-card>
         <v-alert
+          v-if="hasValidationWarnings"
+          :title="`${countValidationWarnings} file(s) have missing fields`"
+          text="The remaining data from those files will be included in your download"
+          type="warning"
+          icon="mdi-alert"
+          class="mt-2"
+        ></v-alert>
+        <v-alert
           v-if="hasValidationErrors"
-          title="Invalid files"
+          :title="`${countValidationErrors} file(s) have errors in formatting or content`"
           text="Please remove the invalid files"
           color="error"
           icon="mdi-alert-circle"
@@ -144,12 +152,28 @@ const ingestFiles = async (files: FileList | null) => {
   }
 };
 
+/* number of files in the uploadedFilesStore with validation errors. */
+const countValidationErrors = computed<number>(() => {
+  return uploadedFiles.value.filter((f) => f.validationErrors?.length).length;
+});
+
 /* Returns true if any one or more files in the uploadedFilesStore
 has a validation error. Returns false otherwise. */
 const hasValidationErrors = computed<boolean>(() => {
-  return (
-    uploadedFiles.value.filter((f) => f.validationErrors?.length).length > 0
-  );
+  return countValidationErrors.value > 0;
+});
+
+/* number of files in the uploadedFilesStore with validation warnings. */
+const countValidationWarnings = computed<number>(() => {
+  return uploadedFiles.value.filter(
+    (f) => f.validationWarnings?.length && !f.validationErrors?.length,
+  ).length;
+});
+
+/* Returns true if any one or more files in the uploadedFilesStore
+has a validation warning. Returns false otherwise. */
+const hasValidationWarnings = computed<boolean>(() => {
+  return countValidationWarnings.value > 0;
 });
 
 const reset = () => {
