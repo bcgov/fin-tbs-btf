@@ -19,7 +19,7 @@ const theme = {
     primary: "#003366",
     secondary: "#385a8a",
     error: "#ce3e39",
-    warning: "#81692c",
+    warning: "#F8BB47",
     success: "#00A54F",
     link: "#255A90",
     tab: "#1E5189",

@@ -22,6 +22,7 @@ const mockLoadingUploadedFile: UploadedFile = {
   file: new File([""], "mockLoading.pdf", { type: "application/pdf" }),
   parsedData: {},
   validationErrors: [],
+  validationWarnings: [],
   isLoading: true,
 };
 
@@ -30,6 +31,7 @@ const mockValidUploadedFile: UploadedFile = {
   file: new File([""], "mockValid.pdf", { type: "application/pdf" }),
   parsedData: {},
   validationErrors: [],
+  validationWarnings: [],
   isLoading: false,
 };
 
@@ -38,6 +40,7 @@ const mockInvalidUploadedFile: UploadedFile = {
   file: new File([""], "mockInvalid.pdf", { type: "application/pdf" }),
   parsedData: {},
   validationErrors: [new Error("mock error")],
+  validationWarnings: [],
   isLoading: false,
 };
 
