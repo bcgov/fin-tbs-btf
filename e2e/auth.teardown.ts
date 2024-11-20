@@ -1,6 +1,11 @@
 import { test } from "@playwright/test";
-import { PagePaths } from "./utils/paths";
+import { UploadPage } from "./pages/uploadPage";
+import { LoginPage } from "./pages/loginPage";
 
 test("logout", async ({ page }) => {
-  await page.goto(PagePaths.LOGOUT);
+  const uploadPage = new UploadPage(page);
+  await uploadPage.visit();
+  await uploadPage.logout();
+  const loginPage = new LoginPage(page);
+  await loginPage.expectLoginPage(); //should be on login page
 });

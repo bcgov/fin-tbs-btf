@@ -1,8 +1,8 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 const globalSetup = (config) => {
   dotenv.config({
-    path: '.env.playwright',
+    path: ".env.playwright",
     override: true,
   });
 };

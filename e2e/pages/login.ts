@@ -1,14 +1,22 @@
 import { authenticator } from "otplib";
 import { PagePaths } from "../utils/paths";
 import { BasePage } from "./basePage";
+import { expect, Locator } from "@playwright/test";
 
 export class LoginPage extends BasePage {
   static path = PagePaths.LOGIN;
 
-  async setup() {}
+  loginButton: Locator;
+
+  async setup() {
+    this.loginButton = await this.page.getByRole("button", {
+      name: "Login with IDIR MFA",
+    });
+    await expect(this.loginButton).toBeVisible();
+  }
 
   async login() {
-    await this.page.getByRole("button").click();
+    await this.loginButton.click();
     await this.page.getByLabel("Enter your email, phone, or").click();
     await this.page
       .getByPlaceholder("Email, phone, or Skype")
