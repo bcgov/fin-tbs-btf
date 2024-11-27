@@ -1,20 +1,22 @@
 import { authenticator } from "otplib";
 import { PagePaths } from "../utils/paths";
 import { BasePage } from "./basePage";
-import { expect, Locator } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 
 export class LoginPage extends BasePage {
-  static path = PagePaths.LOGIN;
-
   loginButton: Locator;
 
-  async setup() {
-    this.loginButton = await this.page.getByRole("button", {
+  constructor(page: Page) {
+    super(page);
+    this.loginButton = this.page.getByRole("button", {
       name: "Login with IDIR MFA",
     });
-    await expect(this.loginButton).toBeVisible();
   }
 
+  /** Navigate to the login page */
+  async visit() {
+    await this.page.goto(PagePaths.LOGIN);
+  }
   async login() {
     await this.loginButton.click();
     await this.page.getByLabel("Enter your email, phone, or").click();
@@ -36,5 +38,13 @@ export class LoginPage extends BasePage {
     await this.page.getByRole("button", { name: "Verify" }).click();
     await this.page.getByText("Don't show this again").click();
     await this.page.getByRole("button", { name: "Yes" }).click();
+  }
+
+  //////////
+  // EXPECT
+  //////////
+
+  async expectLoginPage() {
+    await expect(this.loginButton).toBeVisible();
   }
 }

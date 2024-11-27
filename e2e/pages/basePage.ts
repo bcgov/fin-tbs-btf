@@ -1,18 +1,29 @@
-import { Page, expect } from "@playwright/test";
-import { PagePaths } from "../utils/paths";
+import { Locator, Page, expect } from "@playwright/test";
 
 export class BasePage {
-  constructor(public readonly page: Page) {}
-
-  async setup() {}
-
-  async verifyUserIsDisplayed() {
-    await expect(this.page.getByTestId("account-info")).toContainText("TBS");
+  logoutButton: Locator;
+  userName: Locator;
+  constructor(public readonly page: Page) {
+    this.logoutButton = this.page.getByRole("button", {
+      name: "Logout",
+    });
+    this.userName = this.page.getByTestId("account-info");
   }
+
   async logout() {
-    await this.page.getByRole("button", { name: "Logout" }).click();
+    await this.logoutButton.click();
     await this.page
       .locator(`[data-test-id="${process.env.E2E_AUTO_TEST_USER_NAME}"]`)
       .click();
+  }
+
+  //////////
+  // EXPECT
+  //////////
+
+  /** Expect the name and logout button to be shown */
+  async expectLoggedIn() {
+    await expect(this.userName).toContainText("TBS");
+    await expect(this.logoutButton).toBeVisible();
   }
 }
