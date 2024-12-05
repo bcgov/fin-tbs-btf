@@ -4,12 +4,16 @@ import { FileDropInfo } from "./playwrightUtils";
 import { LocalDateTime, ZonedDateTime } from "@js-joda/core";
 import * as XLSX from "xlsx";
 import { buffer } from "node:stream/consumers";
+import fs from "fs";
 
 /*
  * This file contains the functions and data manage and validate the
  * existing three files in the asset folder, as well as create new
  * files in a Buffer.
  */
+
+// the last modified date of the assets
+const assetLastModifiedDate = "2024-10-21 12:09:00 PM";
 
 export enum FileAsset {
   VALID,
@@ -34,7 +38,7 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
       "TBS Use Only",
       "Processed",
       "01-Jan-25",
-      "2024-11-20 04:13:08 PM",
+      assetLastModifiedDate,
       "Estimates",
       "TBS",
       "128",
@@ -70,6 +74,15 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
       " ",
     ].concat(...Array(38).fill(""), ""),
   },
+};
+
+/** Set the modified date of the assets for some of the tests. */
+export const initAssets = async () => {
+  const date = new Date(assetLastModifiedDate);
+  const time = date.getTime() / 1000; // Convert milliseconds to seconds
+  for (const [key, value] of Object.entries(dicToAssetToData)) {
+    await fs.promises.utimes(value.path, time, time);
+  }
 };
 
 /**
