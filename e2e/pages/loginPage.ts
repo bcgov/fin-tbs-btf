@@ -13,10 +13,6 @@ export class LoginPage extends BasePage {
     });
   }
 
-  /** Navigate to the login page */
-  async visit() {
-    await this.page.goto(PagePaths.LOGIN);
-  }
   async login() {
     await this.loginButton.click();
     await this.page.getByLabel("Enter your email, phone, or").click();

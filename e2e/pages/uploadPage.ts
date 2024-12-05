@@ -55,11 +55,6 @@ export class UploadPage extends BasePage {
     });
   }
 
-  /** Navigate to the upload form page */
-  async visit() {
-    await this.page.goto(PagePaths.UPLOAD);
-  }
-
   /** Uploads files from the asset folder in a single filechooser dialog. */
   async uploadAssets(status: FileAsset[]) {
     const fileChooserPromise = this.page.waitForEvent("filechooser");

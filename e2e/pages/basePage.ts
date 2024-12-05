@@ -1,4 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
+import { PagePaths } from "../utils/paths";
 
 export class BasePage {
   logoutButton: Locator;
@@ -8,6 +9,11 @@ export class BasePage {
       name: "Logout",
     });
     this.userName = this.page.getByTestId("account-info");
+  }
+
+  /** Navigate to the base page */
+  async visit() {
+    await this.page.goto(PagePaths.BASE);
   }
 
   async logout() {
