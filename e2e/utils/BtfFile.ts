@@ -4,7 +4,7 @@ import { FileDropInfo } from "./playwrightUtils";
 import { LocalDateTime, ZonedDateTime } from "@js-joda/core";
 import * as XLSX from "xlsx";
 import { buffer } from "node:stream/consumers";
-import fs from "fs";
+import { utimes } from "node:fs/promises";
 
 /*
  * This file contains the functions and data manage and validate the
@@ -13,7 +13,8 @@ import fs from "fs";
  */
 
 // the last modified date of the assets
-const assetLastModifiedDate = "2024-10-21 12:09:00 PM";
+const assetLastModifiedDate_timestamp = "2024-10-21T19:09:00.000Z"; // Used to set the timestamp of the file
+const assetLastModifiedDate_output = "2024-10-21 12:09:00 PM"; // The expected value to be shown in the output
 
 export enum FileAsset {
   VALID,
@@ -38,7 +39,7 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
       "TBS Use Only",
       "Processed",
       "01-Jan-25",
-      assetLastModifiedDate,
+      assetLastModifiedDate_output,
       "Estimates",
       "TBS",
       "128",
@@ -78,10 +79,9 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
 
 /** Set the modified date of the assets for some of the tests. */
 export const initAssets = async () => {
-  const date = new Date(assetLastModifiedDate);
-  const time = date.getTime() / 1000; // Convert milliseconds to seconds
+  const date = new Date(assetLastModifiedDate_timestamp);
   for (const [key, value] of Object.entries(dicToAssetToData)) {
-    await fs.promises.utimes(value.path, time, time);
+    await utimes(value.path, date, date);
   }
 };
 
