@@ -19,7 +19,7 @@ export class BasePage {
   async logout() {
     await this.logoutButton.click();
     await this.page
-      .locator(`[data-test-id="${process.env.E2E_AUTO_TEST_USER_NAME}"]`)
+      .locator(`[data-test-id="${process.env.E2E_AUTO_TEST_EMAIL}"]`)
       .click();
   }
 

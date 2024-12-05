@@ -1,6 +1,5 @@
 import { Download, expect, Locator, Page } from "playwright/test";
 import { BasePage } from "./basePage";
-import { PagePaths } from "../utils/paths";
 import { dragAndDropFile, FileDropInfo } from "../utils/playwrightUtils";
 import {
   BtfGeneratedFile,

@@ -1,5 +1,4 @@
 import { authenticator } from "otplib";
-import { PagePaths } from "../utils/paths";
 import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
@@ -18,7 +17,7 @@ export class LoginPage extends BasePage {
     await this.page.getByLabel("Enter your email, phone, or").click();
     await this.page
       .getByPlaceholder("Email, phone, or Skype")
-      .fill(process.env.E2E_AUTO_TEST_USER_NAME!);
+      .fill(process.env.E2E_AUTO_TEST_EMAIL!);
     await this.page.getByRole("button", { name: "Next" }).click();
     await this.page.getByPlaceholder("Password").click();
     await this.page
