@@ -6,7 +6,6 @@ test.describe("basePage", () => {
   test("header", async ({ page }) => {
     await page.goto(baseURL);
     const basePage = new BasePage(page);
-    await basePage.expectUserName();
-    await basePage.expectUserName();
+    await basePage.expectLoggedIn();
   });
 });

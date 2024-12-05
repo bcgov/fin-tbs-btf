@@ -12,7 +12,7 @@ setup("authenticate", async ({ page }) => {
   await loginPage.visit();
   await loginPage.expectLoginPage();
   await loginPage.login();
-  await loginPage.expectUserName();
+  await loginPage.expectLoggedIn();
 
   await page.context().storageState({ path: authFile });
 });
