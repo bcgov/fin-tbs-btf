@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
 import { ref } from "vue";
-import { pdfOptionalFields, pdfRequiredFields } from "../constants";
+import { pdfRequiredFields, pdfOptionalFields } from "../constants";
 import PdfService from "../services/pdf-service";
 
 export type UploadedFile = {

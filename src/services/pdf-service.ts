@@ -9,6 +9,7 @@ import {
 } from "@js-joda/core";
 import { Locale } from "@js-joda/locale_en";
 import "@js-joda/timezone";
+import { fieldsMetadataLookupByName } from "../constants";
 
 export class PdfParseError extends Error {}
 
@@ -66,26 +67,30 @@ const pdfServicePrivate = {
     fieldsData: Record<string, string>,
   ) {
     annotations.forEach((annotation) => {
-      if (annotation.hasOwnProperty("fieldName")) {
-        if (annotation.fieldType === "Ch" && annotation.options) {
-          // Dropdowns (ie Choices) have two values, the 'key' of the selected value, and the value 'displayed' to the user
-          const key = annotation.fieldValue[0];
-          const displayed =
-            annotation.options.find((option: any) => option.exportValue === key)
-              ?.displayValue || key;
-          fieldsData[annotation.fieldName] = displayed;
+      if (!annotation.hasOwnProperty("fieldName")) return;
+      if (annotation.fieldType === "Ch" && annotation.options) {
+        // Dropdowns (ie Choices) have two values, the 'key' of the selected value, and the value 'displayed' to the user
+        const key = annotation.fieldValue[0];
+        const displayed =
+          annotation.options.find((option: any) => option.exportValue === key)
+            ?.displayValue || key;
+        fieldsData[annotation.fieldName] = displayed;
 
-          // If the key and the displayed value are different, then we may want to keep both values
-          if (key != displayed) {
-            if (annotation.fieldName == "FROM_CLIENT_NAME")
-              fieldsData["FROM_CLIENT_CD"] = key;
-            if (annotation.fieldName == "TO_CLIENT_NAME")
-              fieldsData["TO_CLIENT_CD"] = key;
-          }
-        } else {
-          // Other fields (e.g., text inputs)
-          fieldsData[annotation.fieldName] = annotation.fieldValue;
+        // If the key and the displayed value are different, then we may want to keep both values
+        const keyName = fieldsMetadataLookupByName.get(
+          annotation.fieldName,
+        )?.dropDownKey;
+        if (key != displayed && keyName) {
+          fieldsData[keyName] = key;
         }
+      } else {
+        // Other fields (e.g., text inputs)
+        if (
+          fieldsMetadataLookupByName.get(annotation.fieldName)
+            ?.useDisplayedValue
+        )
+          fieldsData[annotation.fieldName] = annotation.textContent[0];
+        else fieldsData[annotation.fieldName] = annotation.fieldValue;
       }
     });
   },

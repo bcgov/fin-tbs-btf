@@ -98,7 +98,7 @@ import { useUploadedFilesStore } from "../stores/uploaded-files-store";
 import { storeToRefs } from "pinia";
 import { ref, computed, onMounted } from "vue";
 import excelService from "../services/excel-service";
-import { excelColumnDefaults, excelColumnOrder } from "../constants";
+import { fieldsMetadata } from "../constants";
 
 const uploadedFilesStore = useUploadedFilesStore();
 const authStore = useAuthStore();
@@ -201,8 +201,7 @@ const saveExcel = async () => {
     };
     await excelService.exportToExcel(
       extractedData,
-      excelColumnOrder,
-      excelColumnDefaults,
+      fieldsMetadata,
       auditDetails,
     );
     console.log("Excel file has been created successfully!");
