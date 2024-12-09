@@ -14,7 +14,7 @@
     <div v-if="APP_VERSION" style="color: rgba(255, 255, 255, 0.87)">
       {{ APP_VERSION }}
     </div>
-    <div v-if="user">
+    <div v-if="user" data-testid="account-info">
       <v-icon icon="mdi-account" size="small" />
       {{ user?.display_name }}
     </div>

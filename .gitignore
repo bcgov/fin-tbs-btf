@@ -22,3 +22,11 @@ dist-ssr
 *.sln
 *.sw?
 .idea
+
+#playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.env.playwright
+user.json

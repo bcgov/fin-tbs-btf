@@ -92,7 +92,7 @@ const pdfServicePrivate = {
 
   /** Convert epocMilli (eg. from a file modified time) to a format for Microsoft Access. */
   epocMilliToAccessDateStr(epocMilli: number): string {
-    return ZonedDateTime.ofInstant(
+    const date = ZonedDateTime.ofInstant(
       Instant.ofEpochMilli(epocMilli),
       ZoneId.of("America/Vancouver"),
     )
@@ -103,6 +103,8 @@ const pdfServicePrivate = {
       )
       .replace("a.m.", "AM")
       .replace("p.m.", "PM");
+
+    return date;
   },
 };
 
