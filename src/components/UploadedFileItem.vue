@@ -2,9 +2,9 @@
   <v-list-item class="d-flex justify-start">
     <template v-slot:default>
       <v-btn
+        v-if="uploadedFile.isLoading"
         :loading="true"
         variant="text"
-        v-if="uploadedFile.isLoading"
         class="px-0"
         style="min-width: 20px"
       ></v-btn>
