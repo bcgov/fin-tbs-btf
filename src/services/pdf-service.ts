@@ -1,15 +1,10 @@
 import * as pdfjs from "pdfjs-dist";
 import "../workers/pdfjsWorker";
 import "@js-joda/core";
-import {
-  DateTimeFormatter,
-  Instant,
-  ZonedDateTime,
-  ZoneId,
-} from "@js-joda/core";
-import { Locale } from "@js-joda/locale_en";
+import { DateTimeFormatter, Instant, ZoneId } from "@js-joda/core";
 import "@js-joda/timezone";
 import { fieldsMetadataLookupByName } from "../constants";
+import { Locale } from "@js-joda/locale_en";
 
 export class PdfParseError extends Error {}
 
@@ -95,19 +90,12 @@ const pdfServicePrivate = {
     });
   },
 
-  /** Convert epocMilli (eg. from a file modified time) to a format for Microsoft Access. */
+  /** Convert epocMilli (eg. from a file modified time) to the common document format. */
   epocMilliToAccessDateStr(epocMilli: number): string {
-    const date = ZonedDateTime.ofInstant(
-      Instant.ofEpochMilli(epocMilli),
-      ZoneId.of("America/Vancouver"),
-    )
-      .format(
-        DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a").withLocale(
-          Locale.CANADA,
-        ),
-      )
-      .replace("a.m.", "AM")
-      .replace("p.m.", "PM");
+    const date = Instant.ofEpochMilli(epocMilli)
+      .atZone(ZoneId.UTC)
+      //.format(DateTimeFormatter.ISO_LOCAL_DATE);
+      .format(DateTimeFormatter.ofPattern("dd-MMM-yy").withLocale(Locale.US));
 
     return date;
   },

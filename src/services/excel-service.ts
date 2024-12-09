@@ -1,7 +1,8 @@
-import { DateTimeFormatter, ZonedDateTime, ZoneId } from "@js-joda/core";
+import { DateTimeFormatter, LocalDate, LocalDateTime } from "@js-joda/core";
 import ExcelJS from "exceljs";
 import { FieldMetadata } from "../constants";
 import { saveAs } from "file-saver";
+import { Locale } from "@js-joda/locale_en";
 
 const excelService = {
   /**
@@ -40,9 +41,15 @@ const excelService = {
           if (column.overrideValue != null) return column.overrideValue;
           else if (column.type == "number")
             return Number.parseInt(input[column.name]);
-          else if (column.type == "date")
-            return new Date(input[column.name]); //TODO: timezone not applied
-          else return input[column.name];
+          else if (column.type == "date") {
+            const date = LocalDate.parse(
+              input[column.name],
+              DateTimeFormatter.ofPattern("dd'-'MMM'-'yy").withLocale(
+                Locale.US,
+              ),
+            ).format(DateTimeFormatter.ISO_LOCAL_DATE);
+            return new Date(date);
+          } else return input[column.name];
         });
       });
 
@@ -65,7 +72,7 @@ const excelService = {
       auditWorksheet.columns = [{ width: 15 }, { width: 25 }];
 
       // Download the Excel file
-      const dateTime = ZonedDateTime.now(ZoneId.systemDefault()).format(
+      const dateTime = LocalDateTime.now().format(
         DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"),
       );
       const buffer = await workbook.xlsx.writeBuffer();
