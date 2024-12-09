@@ -21,6 +21,8 @@
     "@js-joda/timezone": "^2.21.1",
     "@mdi/font": "^7.4.47",
     "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "fin-tbs-btf-frontend": "file:",
     "keycloak-js": "^26.0.0",
     "otplib": "^12.0.1",
@@ -30,14 +32,14 @@
     "uuid": "^11.0.0",
     "vue": "^3.5.9",
     "vue-router": "^4.4.5",
-    "vuetify": "^3.7.2",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+    "vuetify": "^3.7.2"
   },
   "devDependencies": {
     "@pinia/testing": "^0.1.6",
     "@playwright/test": "^1.49.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/vue": "^8.1.0",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^22.9.0",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.1.4",
