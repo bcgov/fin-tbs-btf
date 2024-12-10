@@ -3,7 +3,7 @@ export type FieldMetadata = {
   name: string;
   /** Column type in the output */
   type?: "number" | "text" | "date";
-  align?:
+  horizontalalign?:
     | "fill"
     | "left"
     | "right"
@@ -25,15 +25,15 @@ export type FieldMetadata = {
 // prettier-ignore
 /**  */
 export const fieldsMetadata: FieldMetadata[] = [
-  { name: "CONTROL_NUM", align: "right", required: true },
+  { name: "CONTROL_NUM", horizontalalign: "right", required: true },
   { name: "STATUS_DESCR", overrideValue: "Processed" },
-  { name: "EFFECTIVE_DT", type: "date", align: "right", useDisplayedValue: true },
-  { name: "LAST_ACTED_ON_AUDIT_TS", type: "date", align: "right" },
+  { name: "EFFECTIVE_DT", type: "date", horizontalalign: "right", useDisplayedValue: true },
+  { name: "LAST_ACTED_ON_AUDIT_TS", type: "date", horizontalalign: "right" },
   { name: "NEXT_TO_ACT_LAST_NAME", overrideValue: "Estimates" },
   { name: "NEXT_TO_ACT_FIRST_NAME", overrideValue: "TBS" },
-  { name: "FROM_CLIENT_CD", type: "text", align: "right", required: false },
+  { name: "FROM_CLIENT_CD", type: "text", horizontalalign: "right", required: false },
   { name: "FROM_CLIENT_NAME", required: true, dropDownKey: "FROM_CLIENT_CD" },
-  { name: "TO_CLIENT_CD", type: "text", align: "right", required: false },
+  { name: "TO_CLIENT_CD", type: "text", horizontalalign: "right", required: false },
   { name: "TO_CLIENT_NAME", required: true, dropDownKey: "TO_CLIENT_CD" },
   { name: "FISCAL_YEAR", type: "number", required: true },
   { name: "TRANSFER_REASON", required: true },

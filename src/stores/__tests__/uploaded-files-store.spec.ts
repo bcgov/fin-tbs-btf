@@ -1,7 +1,9 @@
 import { createTestingPinia } from "@pinia/testing";
 import { setActivePinia } from "pinia";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import PdfService, { PdfParseError } from "../../services/pdf-service";
+import PdfService, {
+  PdfParseError,
+} from "../../services/InterMinistryTransferData";
 import { useUploadedFilesStore } from "../uploaded-files-store";
 
 // Parts of the pdfjs library used by PdfService are not supported in

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import pdfService from "../pdf-service";
+import pdfService from "../InterMinistryTransferData";
 
 // Mock the web worker because "Web Workers are not supported in this environment."
 vi.mock("../../workers/pdfjsWorker", () => ({}));

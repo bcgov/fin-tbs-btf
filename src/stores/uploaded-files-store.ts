@@ -1,13 +1,12 @@
 import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
 import { ref } from "vue";
-import { pdfRequiredFields, pdfOptionalFields } from "../constants";
-import PdfService from "../services/pdf-service";
+import { InterMinistryTransferData } from "../services/InterMinistryTransferData";
 
 export type UploadedFile = {
   uploadedFileId: string;
   file: File;
-  parsedData: Record<string, string>;
+  parsedData: Record<string, string | number | Date | null>;
   validationErrors: any;
   validationWarnings: any;
   isLoading: any;
@@ -32,19 +31,15 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
     uploadedFiles.value.push(uploadedFile);
 
     try {
-      uploadedFile.parsedData = await PdfService.parsePDF(file);
-      const errors = PdfService.getMissingFields(
-        uploadedFile.parsedData,
-        pdfRequiredFields,
-      );
+      const data = new InterMinistryTransferData();
+      await data.importFromPDF(file);
+      uploadedFile.parsedData = data.fieldsData;
+      const errors = data.getMissingRequiredFields();
       if (errors.length)
         uploadedFile.validationErrors.value = [
           new Error("Missing required fields"),
         ];
-      uploadedFile.validationWarnings.value = PdfService.getMissingFields(
-        uploadedFile.parsedData,
-        pdfOptionalFields,
-      );
+      uploadedFile.validationWarnings.value = data.getMissingOptionalFields();
     } catch (e) {
       uploadedFile.validationErrors.value = [new Error("Invalid PDF")];
     } finally {

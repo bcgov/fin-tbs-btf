@@ -4,7 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-import PdfService, { PdfParseError } from "../../services/pdf-service";
+import PdfService, {
+  PdfParseError,
+} from "../../services/InterMinistryTransferData";
 import { useUploadedFilesStore } from "../../stores/uploaded-files-store";
 import UploadPage from "../UploadPage.vue";
 

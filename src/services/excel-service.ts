@@ -1,8 +1,7 @@
-import { DateTimeFormatter, LocalDate, LocalDateTime } from "@js-joda/core";
+import { DateTimeFormatter, LocalDateTime } from "@js-joda/core";
 import ExcelJS from "exceljs";
-import { FieldMetadata } from "../constants";
+import { fieldsMetadata } from "../constants";
 import { saveAs } from "file-saver";
-import { Locale } from "@js-joda/locale_en";
 
 const excelService = {
   /**
@@ -12,8 +11,7 @@ const excelService = {
    * @param fieldMetadata - The order of columns to be used in the Excel file
    */
   async exportToExcel(
-    inputRows: Record<string, string>[],
-    fieldMetadata: FieldMetadata[],
+    inputRows: Record<string, string | number | Date | null>[],
     auditData: Record<string, string>,
   ) {
     try {
@@ -21,55 +19,28 @@ const excelService = {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("DATA");
 
-      const sheetColumnMeta: typeof worksheet.columns = fieldMetadata.map(
-        (x) => ({
-          header: x.name,
-          width: x.name.length * 1.25, // make slightly larger because headers are in all caps
-          style: x.type == "date" ? { numFmt: "d-mmm-yy" } : {},
-        }),
-      );
-
-      // Turn each row from the input into an array for output using the order of the fieldMetadata
-      const formattedData = inputRows.map((input) => {
-        return fieldMetadata.map((column, i) => {
-          // adjust width depending on content
-          sheetColumnMeta[i].width = Math.max(
-            sheetColumnMeta[i].width ?? 10,
-            input[column.name]?.length ?? 0,
-          );
-          // change the type(string/number/date) to the correct one
-          if (column.overrideValue != null) return column.overrideValue;
-          else if (column.type == "number")
-            return Number.parseInt(input[column.name]);
-          else if (column.type == "date") {
-            const date = LocalDate.parse(
-              input[column.name],
-              DateTimeFormatter.ofPattern("dd'-'MMM'-'yy").withLocale(
-                Locale.US,
-              ),
-            ).format(DateTimeFormatter.ISO_LOCAL_DATE);
-            return new Date(date);
-          } else return input[column.name];
-        });
-      });
-
-      worksheet.columns = sheetColumnMeta;
+      worksheet.columns = fieldsMetadata.map((x) => ({
+        header: x.name,
+        key: x.name,
+        width: x.name.length * 1.25, // make slightly larger because headers are in all caps
+        style: {
+          numFmt: x.type === "date" ? "d-mmm-yy" : undefined,
+          alignment: x.horizontalalign
+            ? { horizontal: x.horizontalalign }
+            : undefined,
+        },
+      }));
 
       // Add data rows and apply alignment
-      formattedData.forEach((rowData) => {
-        const row = worksheet.addRow(rowData);
-        row.eachCell((cell, colIndex) => {
-          cell.alignment = { horizontal: fieldMetadata[colIndex - 1].align };
-        });
-      });
+      worksheet.addRows(inputRows, "i");
 
       // Audit sheet
       const auditWorksheet = workbook.addWorksheet("METADATA");
-      auditWorksheet.addRow(["Label", "Value"]);
-      Object.entries(auditData).forEach(([key, value]) =>
-        auditWorksheet.addRow([key, value]),
-      );
-      auditWorksheet.columns = [{ width: 15 }, { width: 25 }];
+      auditWorksheet.columns = [
+        { header: "Label", key: "key", width: 15 },
+        { header: "Value", key: "value", width: 25 },
+      ];
+      auditWorksheet.addRows(Object.entries(auditData));
 
       // Download the Excel file
       const dateTime = LocalDateTime.now().format(
