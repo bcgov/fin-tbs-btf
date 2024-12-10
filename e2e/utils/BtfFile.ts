@@ -2,9 +2,9 @@ import { Download, expect } from "playwright/test";
 import path from "path";
 import { FileDropInfo } from "./playwrightUtils";
 import { LocalDateTime, ZonedDateTime } from "@js-joda/core";
-import * as XLSX from "xlsx";
 import { buffer } from "node:stream/consumers";
 import { utimes } from "node:fs/promises";
+import ExcelJS from "exceljs";
 
 /*
  * This file contains the functions and data manage and validate the
@@ -14,7 +14,7 @@ import { utimes } from "node:fs/promises";
 
 // the last modified date of the assets
 const assetLastModifiedDate_timestamp = "2024-10-21T19:09:00.000Z"; // Used to set the timestamp of the file
-const assetLastModifiedDate_output = "2024-10-21 12:09:00 PM"; // The expected value to be shown in the output
+const assetLastModifiedDate_output = "2024-10-21T00:00:00.000Z"; // The expected value to be shown in the output
 
 export enum FileAsset {
   VALID,
@@ -25,7 +25,7 @@ export enum FileAsset {
 type AssetData = FileDropInfo & {
   icon: string;
   missingFields?: string[];
-  validValues?: string[];
+  validValues?: (string | number | Date | null)[];
 };
 
 /** Dictionary containing all the information on the three test files in the assets folder. */
@@ -38,17 +38,17 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
     validValues: [
       "TBS Use Only",
       "Processed",
-      "01-Jan-25",
-      assetLastModifiedDate_output,
+      new Date("2025-01-01T00:00:00.000Z"),
+      new Date(assetLastModifiedDate_output),
       "Estimates",
       "TBS",
       "128",
       "Forests",
       "026",
       "Health",
-      "2024",
+      2024,
       "test_19",
-    ].concat(...Array.from({ length: 36 }, (v, k) => (k + 10).toString()), ""),
+    ].concat(...Array.from({ length: 36 }, (v, k) => k + 10)),
   },
   [FileAsset.INVALID]: {
     fileName: "invalid.pdf",
@@ -65,15 +65,17 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
     validValues: [
       "TBS Use Only",
       "Processed",
-      "",
-      "2024-10-21 12:09:00 PM",
+      null,
+      new Date(assetLastModifiedDate_output),
       "Estimates",
       "TBS",
-      "",
+      null,
       " ",
-      "",
+      null,
       " ",
-    ].concat(...Array(38).fill(""), ""),
+      NaN,
+      "",
+    ].concat(...Array(36).fill(NaN)),
   },
 };
 
@@ -114,20 +116,31 @@ export class BtfGeneratedFile {
 
     // load xlsx
     const stream = await this.downloadedFile.createReadStream();
-    const workbook = XLSX.read(await buffer(stream), {
-      type: "buffer",
+
+    const temp = new ExcelJS.Workbook();
+    const workbook = await temp.xlsx.load(await buffer(stream));
+    const book: any[] = [];
+
+    workbook.eachSheet((worksheet) => {
+      const sheet: any[] = [];
+      worksheet.eachRow((row, rowNumber) => {
+        const rowData: any[] = [];
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          rowData.push(cell.value); // Use `cell.value` to get the value of the cell
+        });
+        sheet.push(rowData); // Add the row data (array of cell values)
+      });
+      book.push(sheet); // Add the sheet to the book
     });
-    expect(workbook.SheetNames.length).toBe(2);
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    const sheetData: string[][] = XLSX.utils.sheet_to_json(firstSheet, {
-      header: 1,
-    });
+
+    expect(book).toHaveLength(2);
+    const sheetData = book[0];
 
     //number of rows
     expect(sheetData).toHaveLength(assets.length + 1);
 
     //header row only has uppercase and underscore
-    for (const item of sheetData[0]) expect(item).toMatch(/[A-Z_]/);
+    for (const value of sheetData[0]) expect(value).toMatch(/[A-Z_]/);
 
     //values match file
     for (let i = 0; i < assets.length; ++i)
@@ -136,10 +149,7 @@ export class BtfGeneratedFile {
       );
 
     //metadata
-    const secondSheet = workbook.Sheets[workbook.SheetNames[1]];
-    const sheetMetaData: string[][] = XLSX.utils.sheet_to_json(secondSheet, {
-      header: 1,
-    });
+    const sheetMetaData = book[1];
 
     for (const [key, value] of sheetMetaData) {
       if (key == "Label") expect(value).toBe("Value");
