@@ -4,7 +4,7 @@ import { vi } from "vitest";
 export class InterMinistryTransferData {
   fieldsData: Record<string, string | number | Date | null> = {};
 
-  async importFromPDF(file: File): Promise<void> {
+  async importFromPDF(): Promise<void> {
     this.fieldsData = {
       field1: "value1",
       field2: "value2",

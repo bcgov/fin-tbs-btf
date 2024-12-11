@@ -6,10 +6,7 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import { useUploadedFilesStore } from "../../stores/uploaded-files-store";
 import UploadPage from "../UploadPage.vue";
-import {
-  ImtdTestHelpers,
-  InterMinistryTransferData,
-} from "../../services/__mocks__/InterMinistryTransferData";
+import { ImtdTestHelpers } from "../../services/__mocks__/InterMinistryTransferData";
 import { PdfParseError } from "../../services/InterMinistryTransferData";
 
 // Parts of the pdfjs library used by PdfService are not supported in
