@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import pdfService from "../InterMinistryTransferData";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { InterMinistryTransferData } from "../InterMinistryTransferData";
 
 // Mock the web worker because "Web Workers are not supported in this environment."
 vi.mock("../../workers/pdfjsWorker", () => ({}));
@@ -16,11 +16,11 @@ const mockPdfFile = new File([""], "filename.pdf", {
 });
 mockPdfFile.arrayBuffer = async () => new ArrayBuffer(0);
 
-describe("pdfService", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
+describe("InterMinistryTransferData", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
-  describe("parsePDF", () => {
+  describe("importFromPDF", () => {
     it("should handle parsing PDF and extracting form fields", async () => {
       // Mock getDocument and PDF document
       const mockPdfDoc = {
@@ -37,7 +37,9 @@ describe("pdfService", () => {
       });
 
       // Run the service
-      const fields = await pdfService.parsePDF(mockPdfFile);
+      const imtd = new InterMinistryTransferData();
+      await imtd.importFromPDF(mockPdfFile);
+      const fields = imtd.fieldsData;
 
       // Assertions
       expect(fields).toEqual({
@@ -77,7 +79,9 @@ describe("pdfService", () => {
       });
 
       // Run the service
-      const fields = await pdfService.parsePDF(mockPdfFile);
+      const imtd = new InterMinistryTransferData();
+      await imtd.importFromPDF(mockPdfFile);
+      const fields = imtd.fieldsData;
 
       // Assertions: Ensure the correct option is selected
       expect(fields).toEqual({
@@ -113,7 +117,9 @@ describe("pdfService", () => {
       });
 
       // Run the service
-      const fields = await pdfService.parsePDF(mockPdfFile);
+      const imtd = new InterMinistryTransferData();
+      await imtd.importFromPDF(mockPdfFile);
+      const fields = imtd.fieldsData;
 
       // Assertions: Ensure the correct option is selected
       expect(fields).toEqual({
@@ -133,7 +139,8 @@ describe("pdfService", () => {
       });
 
       // Catch the error
-      await expect(pdfService.parsePDF(mockPdfFile)).rejects.toThrow(
+      const imtd = new InterMinistryTransferData();
+      await expect(await imtd.importFromPDF(mockPdfFile)).rejects.toThrow(
         "Cannot read PDF",
       );
     });
