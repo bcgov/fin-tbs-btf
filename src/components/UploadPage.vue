@@ -96,9 +96,8 @@ import UploadedFileItem from "./UploadedFileItem.vue";
 import { useAuthStore } from "../stores/auth-store";
 import { useUploadedFilesStore } from "../stores/uploaded-files-store";
 import { storeToRefs } from "pinia";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, toRaw } from "vue";
 import excelService from "../services/excel-service";
-import { excelColumnDefaults, excelColumnOrder } from "../constants";
 
 const uploadedFilesStore = useUploadedFilesStore();
 const authStore = useAuthStore();
@@ -187,7 +186,7 @@ const saveExcel = async () => {
     // into one array
     const extractedData = uploadedFiles.value
       .filter((f) => f.parsedData && !f.validationErrors.length)
-      .map((f) => f.parsedData);
+      .map((f) => toRaw(f.parsedData));
 
     const auditDetails = {
       IDIR: user.value?.idir_username,
@@ -199,12 +198,7 @@ const saveExcel = async () => {
       "File Created": new Date().toISOString(),
       "# PDFs": extractedData.length.toString(),
     };
-    await excelService.exportToExcel(
-      extractedData,
-      excelColumnOrder,
-      excelColumnDefaults,
-      auditDetails,
-    );
+    await excelService.exportToExcel(extractedData, auditDetails);
     console.log("Excel file has been created successfully!");
   } catch (error) {
     console.error("Error exporting to Excel:", error);
