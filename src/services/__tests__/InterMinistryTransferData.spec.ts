@@ -1,0 +1,162 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { InterMinistryTransferData } from "../InterMinistryTransferData";
+
+// Mock the web worker because "Web Workers are not supported in this environment."
+vi.mock("../../workers/pdfjsWorker", () => ({}));
+
+// Mock the necessary parts of pdfjs
+const mockGetDocument = vi.fn();
+vi.mock("pdfjs-dist", () => ({
+  getDocument: (...args: any) => mockGetDocument(...args),
+}));
+
+const mockPdfFile = new File([""], "filename.pdf", {
+  type: "application/pdf",
+  lastModified: 1728505460209,
+});
+mockPdfFile.arrayBuffer = async () => new ArrayBuffer(0);
+
+describe("InterMinistryTransferData", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+  describe("importFromPDF", () => {
+    it("should handle parsing PDF and extracting form fields", async () => {
+      // Mock getDocument and PDF document
+      const mockPdfDoc = {
+        numPages: 2,
+        getPage: vi.fn().mockResolvedValue({
+          getAnnotations: vi.fn().mockResolvedValue([
+            { fieldName: "field1", fieldValue: "value1", fieldType: "Tx" },
+            { fieldName: "field2", fieldValue: "value2", fieldType: "Tx" },
+          ]),
+        }),
+      };
+      mockGetDocument.mockReturnValue({
+        promise: Promise.resolve(mockPdfDoc),
+      });
+
+      // Run the service
+      const imtd = new InterMinistryTransferData();
+      await imtd.importFromPDF(mockPdfFile);
+      const fields = imtd.fieldsData;
+
+      // Assertions
+      expect(fields).toEqual({
+        LAST_ACTED_ON_AUDIT_TS: "2024-10-09 01:24:20 PM",
+        field1: "value1",
+        field2: "value2",
+      });
+
+      const arrayBuffer = await mockPdfFile.arrayBuffer();
+      expect(mockGetDocument).toHaveBeenCalledWith({
+        data: arrayBuffer,
+      });
+      expect(mockPdfDoc.getPage).toHaveBeenCalledWith(1);
+      expect(mockPdfDoc.getPage).toHaveBeenCalledWith(2);
+    });
+
+    it('should handle parsing choice fields (fieldType: "Ch")', async () => {
+      // Mock choice field annotation with options
+      const mockPdfDoc = {
+        numPages: 1,
+        getPage: vi.fn().mockResolvedValue({
+          getAnnotations: vi.fn().mockResolvedValue([
+            {
+              fieldName: "dropdownField",
+              fieldValue: ["option2"], // The selected option's value
+              fieldType: "Ch",
+              options: [
+                { value: "option1", displayValue: "Option 1" },
+                { value: "option2", displayValue: "Option 2" },
+              ],
+            },
+          ]),
+        }),
+      };
+      mockGetDocument.mockReturnValue({
+        promise: Promise.resolve(mockPdfDoc),
+      });
+
+      // Run the service
+      const imtd = new InterMinistryTransferData();
+      await imtd.importFromPDF(mockPdfFile);
+      const fields = imtd.fieldsData;
+
+      // Assertions: Ensure the correct option is selected
+      expect(fields).toEqual({
+        LAST_ACTED_ON_AUDIT_TS: "2024-10-09 01:24:20 PM",
+        dropdownField: "option2", // This should match the displayValue of the selected option
+      });
+
+      const arrayBuffer = await mockPdfFile.arrayBuffer();
+      expect(mockGetDocument).toHaveBeenCalledWith({ data: arrayBuffer });
+      expect(mockPdfDoc.getPage).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle empty choice", async () => {
+      // Mock choice field annotation with options
+      const mockPdfDoc = {
+        numPages: 1,
+        getPage: vi.fn().mockResolvedValue({
+          getAnnotations: vi.fn().mockResolvedValue([
+            {
+              fieldName: "dropdownField",
+              fieldValue: [""], // The selected option's value
+              fieldType: "Ch",
+              options: [
+                { value: "option1", displayValue: "Option 1" },
+                { value: "option2", displayValue: "Option 2" },
+              ],
+            },
+          ]),
+        }),
+      };
+      mockGetDocument.mockReturnValue({
+        promise: Promise.resolve(mockPdfDoc),
+      });
+
+      // Run the service
+      const imtd = new InterMinistryTransferData();
+      await imtd.importFromPDF(mockPdfFile);
+      const fields = imtd.fieldsData;
+
+      // Assertions: Ensure the correct option is selected
+      expect(fields).toEqual({
+        LAST_ACTED_ON_AUDIT_TS: "2024-10-09 01:24:20 PM",
+        dropdownField: "", // This should match the fieldValue and not any of the options
+      });
+
+      const arrayBuffer = await mockPdfFile.arrayBuffer();
+      expect(mockGetDocument).toHaveBeenCalledWith({ data: arrayBuffer });
+      expect(mockPdfDoc.getPage).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle error during PDF parsing", async () => {
+      // Mock getDocument to throw an error
+      mockGetDocument.mockReturnValue({
+        promise: Promise.reject(new Error("PDF parsing error")),
+      });
+
+      // Catch the error
+      const imtd = new InterMinistryTransferData();
+      await expect(await imtd.importFromPDF(mockPdfFile)).rejects.toThrow(
+        "Cannot read PDF",
+      );
+    });
+  });
+
+  describe("getMissingFields", () => {
+    it("should return missing fields", () => {
+      const missing = pdfService.getMissingFields(
+        {
+          LAST_ACTED_ON_AUDIT_TS: "2024-10-09 01:24:20 PM",
+          field1: "value1",
+          field2: "value2",
+        },
+        ["field1", "field2", "field3"],
+      );
+      expect(missing).toEqual(["field3"]);
+    });
+  });
+});
