@@ -2,18 +2,14 @@ import { createTestingPinia } from "@pinia/testing";
 import { setActivePinia } from "pinia";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useUploadedFilesStore } from "../uploaded-files-store";
-import { ImtdTestHelpers } from "../../services/__mocks__/InterMinistryTransferData";
-import { PdfParseError } from "../../services/InterMinistryTransferData";
+import { ImtfdTestHelpers } from "../../data/__mocks__/imtfData";
+import { PdfParseError } from "../../data/imtfData";
 
 // Parts of the pdfjs library used by PdfService are not supported in
 // node.js (they expect to be run in a web browser).  Mock parts of the
 // pdfjs library to work around this issue.
 vi.mock("../../workers/pdfjsWorker", () => ({}));
-vi.mock("pdfjs-dist", () => ({
-  getDocument: vi.fn(),
-}));
-
-vi.mock("../../services/InterMinistryTransferData");
+vi.mock("pdfjs-dist");
 
 const mockPdfFile = new File([""], "filename.pdf", {
   type: "application/pdf",
@@ -56,8 +52,8 @@ describe("UploadedFilesStore", () => {
     });
     describe("when the file is invalid", () => {
       it("adds a file to the 'uploadedFiles' list, and marks the file as invalid", async () => {
-        const spies = ImtdTestHelpers.getSpies();
-        spies.importFromPdfSpy.mockImplementation(() => {
+        const spies = ImtfdTestHelpers.getSpies();
+        spies.importFromPdf.mockImplementation(() => {
           throw new PdfParseError("");
         });
         await uploadedFilesStore.addFile(mockPdfFile);
