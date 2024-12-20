@@ -3,18 +3,18 @@ import "../workers/pdfjsWorker";
 import "@js-joda/core";
 import { DateTimeFormatter, Instant, LocalDate, ZoneId } from "@js-joda/core";
 import "@js-joda/timezone";
+import { fieldsMetadata } from "./imtfMetadata";
 import {
-  fieldsMetadata,
   fieldsMetadataLookupByName,
   pdfOptionalFields,
   pdfRequiredFields,
-} from "../constants";
+} from "./imtfMetadataHelper";
 import { Locale } from "@js-joda/locale_en";
 import { Annotation } from "../types/pdfjs";
 
 export class PdfParseError extends Error {}
 
-export class InterMinistryTransferData {
+export class InterMinistryTransferFormData {
   fieldsData: Record<string, string | number | Date | null> = {};
 
   /**
@@ -22,7 +22,7 @@ export class InterMinistryTransferData {
    * @param file - The PDF file
    * @returns - Returns an object containing extracted form fields
    */
-  async importFromPDF(file: File): Promise<void> {
+  async importFromPdf(file: File): Promise<void> {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await pdfjs.getDocument({ data: arrayBuffer }).promise;
