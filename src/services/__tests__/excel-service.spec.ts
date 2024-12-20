@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import excelService from "../excel-service";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
-import { workbookToJson } from "../../../e2e/utils/excelUtils";
+import { workbookToJsonArray } from "../../../e2e/utils/excelUtils";
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }));
 const mockSaveAs = vi.mocked(saveAs);
@@ -71,7 +71,7 @@ describe("excelService", () => {
 
     // Get the workbook and make sure it's right
     const workbook = xlsxWriteBufferSpy.mock.contexts[0] as ExcelJS.Workbook;
-    const book = workbookToJson(workbook);
+    const book = workbookToJsonArray(workbook);
     expect(book).toEqual([
       [
         [

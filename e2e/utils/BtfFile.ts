@@ -5,7 +5,7 @@ import { LocalDateTime, ZonedDateTime } from "@js-joda/core";
 import { buffer } from "node:stream/consumers";
 import { utimes } from "node:fs/promises";
 import ExcelJS from "exceljs";
-import { workbookToJson } from "./excelUtils";
+import { workbookToJsonArray } from "./excelUtils";
 
 /*
  * This file contains the functions and data manage and validate the
@@ -120,7 +120,7 @@ export class BtfGeneratedFile {
 
     const temp = new ExcelJS.Workbook();
     const workbook = await temp.xlsx.load(await buffer(stream));
-    const book: any[] = workbookToJson(workbook);
+    const book: any[] = workbookToJsonArray(workbook);
 
     expect(book).toHaveLength(2);
     const sheetData = book[0];

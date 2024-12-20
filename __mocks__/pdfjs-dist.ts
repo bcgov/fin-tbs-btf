@@ -5,7 +5,7 @@ const mockGetAnnotations = vi.fn(() => [
   { fieldName: "field4", fieldValue: "value4", fieldType: "Tx" },
 ]);
 
-const mockGetPage = vi.fn((pageIndex) => ({
+const mockGetPage = vi.fn((_pageIndex) => ({
   getAnnotations: mockGetAnnotations,
 }));
 
