@@ -1,5 +1,5 @@
 import { DateTimeFormatter, LocalDateTime } from "@js-joda/core";
-import ExcelJS from "exceljs";
+import { Workbook } from "exceljs";
 import { fieldsMetadata } from "../data/imtfMetadata";
 import { saveAs } from "file-saver";
 
@@ -16,7 +16,7 @@ const excelService = {
   ) {
     try {
       // Create a new workbook and worksheet
-      const workbook = new ExcelJS.Workbook();
+      const workbook = new Workbook();
       const worksheet = workbook.addWorksheet("DATA");
 
       worksheet.columns = fieldsMetadata.map((x) => ({

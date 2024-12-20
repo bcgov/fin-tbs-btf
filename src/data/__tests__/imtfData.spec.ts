@@ -1,28 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { InterMinistryTransferFormData } from "../imtfData.ts";
 import { PdfjsTestHelpers } from "../../../__mocks__/pdfjs-dist.ts";
-import { FieldMetadata } from "../imtfTypes.ts";
 
 // Mock the web worker because "Web Workers are not supported in this environment."
 vi.mock("../../workers/pdfjsWorker", () => ({}));
 vi.mock("pdfjs-dist");
 
-// prettier-ignore
-// Mock all kinds of metadata
-vi.mock("../../data/imtfMetadata.ts", async () => {
-  return {
-    fieldsMetadata: [
-      { name: "LAST_ACTED_ON_AUDIT_TS", required: true,  type: "date" },
-      { name: "field_string",           required: true,  type: "string" }, 
-      { name: "field_number",           required: false, type: "number" }, 
-      { name: "field_date",                              type: "date" }, 
-      { name: "field_dropDown",                          dropDownKey: "field_string" },
-      { name: "field_horizontalAlign",                   horizontalAlign: "right" },
-      { name: "field_overrideValue",                     overrideValue: "test override" },
-      { name: "field_useDisplayedValue",                 useDisplayedValue: true },
-    ] as FieldMetadata[],
-  };
-});
+vi.mock("../../data/imtfMetadata.ts");
 
 const mockPdfFile = new File([""], "filename.pdf", {
   type: "application/pdf",
@@ -48,8 +32,8 @@ describe("InterMinistryTransferFormData", () => {
 
       // Assert that those two fields were not in the output
       expect(imtd.fieldsData).toEqual({
-        LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"), // assert pdf timestamp is always included
-        field_overrideValue: "test override", // assert override from metadata is always set
+        LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"), // pdf timestamp is always included
+        field_overrideValue: "test override", // field_overrideValue from metadata is always set
       });
     });
 
@@ -73,7 +57,7 @@ describe("InterMinistryTransferFormData", () => {
 
     it("should get data from multiple pages in a pdf", async () => {
       PdfjsTestHelpers.setPagesOfMockAnnotations([
-        [{ fieldName: "field_string", fieldValue: "value1", fieldType: "Tx" }], // first page
+        [{ fieldName: "field_text", fieldValue: "value1", fieldType: "Tx" }], // first page
         [{ fieldName: "field_number", fieldValue: "10", fieldType: "Tx" }], // second page
       ]);
 
@@ -83,7 +67,7 @@ describe("InterMinistryTransferFormData", () => {
       expect(imtd.fieldsData).toEqual({
         LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"),
         field_overrideValue: "test override",
-        field_string: "value1", // first page
+        field_text: "value1", // first page
         field_number: 10, // second page
       });
     });
@@ -108,7 +92,7 @@ describe("InterMinistryTransferFormData", () => {
     it("should parse choice fields that have no dropDownKey in metadata", async () => {
       PdfjsTestHelpers.setMockAnnotations([
         {
-          fieldName: "field_string", // field_string does not have a "key" set, so it will not save the key
+          fieldName: "field_text", // field_text does not have a "key" set, so it will not save the key
           fieldValue: ["key2"], // one option selected in the dropdown
           fieldType: "Ch",
           options: [
@@ -124,7 +108,7 @@ describe("InterMinistryTransferFormData", () => {
       expect(imtd.fieldsData).toEqual({
         LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"),
         field_overrideValue: "test override",
-        field_string: "Option 2", // display value is used
+        field_text: "Option 2", // display value is used
       });
     });
 
@@ -148,7 +132,7 @@ describe("InterMinistryTransferFormData", () => {
         LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"),
         field_overrideValue: "test override",
         field_dropDown: "Option 2",
-        field_string: "key2",
+        field_text: "key2",
       });
     });
 
@@ -236,7 +220,7 @@ describe("InterMinistryTransferFormData", () => {
       const imtd = new InterMinistryTransferFormData();
       imtd.fieldsData = {
         LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"),
-        field_string: "test1",
+        field_text: "test1",
         field_number: 10,
       };
 
@@ -250,7 +234,7 @@ describe("InterMinistryTransferFormData", () => {
       };
 
       const missing = imtd.getMissingRequiredFields();
-      expect(missing).toEqual(["field_string"]);
+      expect(missing).toEqual(["field_text"]);
     });
   });
 
@@ -259,7 +243,7 @@ describe("InterMinistryTransferFormData", () => {
       const imtd = new InterMinistryTransferFormData();
       imtd.fieldsData = {
         LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"),
-        field_string: "test1",
+        field_text: "test1",
         field_number: 10,
       };
 

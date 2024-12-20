@@ -1,7 +1,7 @@
 import { FieldMetadata } from "./imtfTypes";
 
 // prettier-ignore
-/**  */
+/** The expected data, columns, and format for both the input pdf and output excel. */
 export const fieldsMetadata: FieldMetadata[] = [
   { name: "CONTROL_NUM", horizontalAlign: "right", required: true },
   { name: "STATUS_DESCR", overrideValue: "Processed" },

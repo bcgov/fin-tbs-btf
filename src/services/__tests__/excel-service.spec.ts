@@ -1,42 +1,58 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import excelService from "../excel-service";
+import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
+import { workbookToJson } from "../../../e2e/utils/excelUtils";
 
-// Mock the XLSX library methods
-const mockXlsxJsonToSheet = vi.fn();
-const mockXlsxBookNew = vi.fn();
-const mockXlsxBookAppendSheet = vi.fn();
-const mockXlsxWriteFile = vi.fn();
-vi.mock("xlsx", () => ({
-  utils: {
-    json_to_sheet: (...args: any) => mockXlsxJsonToSheet(...args),
-    book_new: (...args: any) => mockXlsxBookNew(...args),
-    book_append_sheet: (...args: any) => mockXlsxBookAppendSheet(...args),
-  },
-  writeFile: (...args: any) => mockXlsxWriteFile(...args),
-}));
+vi.mock("file-saver", () => ({ saveAs: vi.fn() }));
+const mockSaveAs = vi.mocked(saveAs);
+vi.mock("../../data/imtfMetadata.ts");
+
+// Mock the `xlsx` property on `ExcelJS.Workbook.prototype`
+const xlsxMock = {
+  writeBuffer: vi.fn(),
+  load: vi.fn(),
+  readFile: vi.fn(),
+  read: vi.fn(),
+  writeFile: vi.fn(),
+  write: vi.fn(),
+};
+
+// helper function
+function stringToDate(date: string, match: RegExp) {
+  const x = date!.match(match);
+  const y = x?.slice(1).map((a) => parseInt(a)) || [];
+  return new Date(y[0], y[1] - 1, y[2], y[3], y[4], y[5]);
+}
 
 describe("excelService", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    // restoring date after each test run
-    vi.useRealTimers();
   });
 
   it("should format extracted data correctly and write to an Excel file", async () => {
-    const date = new Date(2024, 1, 2, 3, 4, 5);
-    vi.setSystemTime(date);
-
-    const extractedData: Record<string, string>[] = [
-      { submissionId: "123", BUDGET2_DOUBTFUL_ACCT_AMT: "500" },
-      { submissionId: "124", BUDGET2_DOUBTFUL_ACCT_AMT: "600" },
+    const inputData: Record<string, string | number | Date | null>[] = [
+      {
+        LAST_ACTED_ON_AUDIT_TS: new Date(2024, 1, 2, 3, 4, 5),
+        field_text: "row1",
+        field_number: 1,
+        field_date: new Date(2024, 1, 2, 3, 4, 5),
+        field_dropDown: "dd",
+        field_horizontalAlign: "ha",
+        field_overrideValue: "ov",
+        field_useDisplayedValue: "dv",
+      },
+      {
+        LAST_ACTED_ON_AUDIT_TS: new Date(2024, 1, 2, 3, 4, 5),
+        field_text: "row2",
+        field_number: 2,
+        field_date: new Date(2024, 1, 2, 3, 4, 5),
+        field_dropDown: "dd",
+        field_horizontalAlign: "ha",
+        field_overrideValue: "ov",
+        field_useDisplayedValue: "dv",
+      },
     ];
-
-    const columnOrder = ["submissionId", "BUDGET2_DOUBTFUL_ACCT_AMT"];
-    const columnDefaults = { submissionId: "N/A", STATUS: "Pending" };
 
     const audit = {
       createdDate: "2024-10-01T12:34:56Z",
@@ -44,105 +60,88 @@ describe("excelService", () => {
       idir: "JDoe123",
     };
 
-    const mockWorksheet = {};
-    const mockAuditWorksheet = {};
-    const mockWorkbook = {};
-
-    // Mock XLSX library functions
-    mockXlsxJsonToSheet
-      .mockReturnValueOnce(mockWorksheet) // First call for form data
-      .mockReturnValueOnce(mockAuditWorksheet); // Second call for audit data
-    mockXlsxBookNew.mockReturnValue(mockWorkbook);
+    const xlsxWriteBufferSpy = vi.spyOn(
+      ExcelJS.Workbook.prototype,
+      "xlsx",
+      "get",
+    );
 
     // Run the service
-    await excelService.exportToExcel(
-      extractedData,
-      columnOrder,
-      columnDefaults,
-      audit,
-    );
+    await excelService.exportToExcel(inputData, audit);
 
-    // Assert the json_to_sheet function was called with correct data
-    expect(mockXlsxJsonToSheet).toHaveBeenCalledTimes(2); //DATA sheet, and again for AUDIT sheet
-    expect(mockXlsxJsonToSheet).toHaveBeenNthCalledWith(
-      1,
+    // Get the workbook and make sure it's right
+    const workbook = xlsxWriteBufferSpy.mock.contexts[0] as ExcelJS.Workbook;
+    const book = workbookToJson(workbook);
+    expect(book).toEqual([
       [
-        {
-          submissionId: "N/A", // test defualt to N/A
-          BUDGET2_DOUBTFUL_ACCT_AMT: "500",
-          STATUS: "Pending", //test default
-        },
-        {
-          submissionId: "N/A",
-          BUDGET2_DOUBTFUL_ACCT_AMT: "600",
-          STATUS: "Pending",
-        },
+        [
+          "LAST_ACTED_ON_AUDIT_TS",
+          "field_text",
+          "field_number",
+          "field_date",
+          "field_dropDown",
+          "field_horizontalAlign",
+          "field_overrideValue",
+          "field_useDisplayedValue",
+        ],
+        [
+          new Date(2024, 1, 2, 3, 4, 5),
+          "row1",
+          1,
+          new Date(2024, 1, 2, 3, 4, 5),
+          "dd",
+          "ha",
+          "ov",
+          "dv",
+        ],
+        [
+          new Date(2024, 1, 2, 3, 4, 5),
+          "row2",
+          2,
+          new Date(2024, 1, 2, 3, 4, 5),
+          "dd",
+          "ha",
+          "ov",
+          "dv",
+        ],
       ],
-      { header: columnOrder },
-    );
-    expect(mockXlsxJsonToSheet).toHaveBeenNthCalledWith(
-      2,
       [
-        {
-          Label: "createdDate",
-          Value: "2024-10-01T12:34:56Z",
-        },
-        {
-          Label: "loginDate",
-          Value: "2024-10-01T08:00:00Z",
-        },
-        {
-          Label: "idir",
-          Value: "JDoe123",
-        },
+        ["Label", "Value"],
+        ["createdDate", "2024-10-01T12:34:56Z"],
+        ["loginDate", "2024-10-01T08:00:00Z"],
+        ["idir", "JDoe123"],
       ],
-      {
-        header: ["Label", "Value"],
-      },
-    );
+    ]);
 
-    // Verify that the book_append_sheet method is called twice
-    expect(mockXlsxBookAppendSheet).toHaveBeenCalledTimes(2); //DATA sheet, and again for AUDIT sheet
-    expect(mockXlsxBookAppendSheet).toHaveBeenNthCalledWith(
-      1,
-      mockWorkbook,
-      mockWorksheet,
-      "DATA",
-    );
-    expect(mockXlsxBookAppendSheet).toHaveBeenNthCalledWith(
-      2,
-      mockWorkbook,
-      mockAuditWorksheet,
-      "METADATA",
-    );
+    // Make sure the horizontal alignment is correct
+    expect(
+      workbook.getWorksheet(1)?.getColumnKey("field_horizontalAlign").alignment
+        ?.horizontal,
+    ).toBe("right");
 
-    // Verify that the writeFile method was called with correct filename and compression options
-    expect(mockXlsxWriteFile).toHaveBeenCalledWith(
-      mockWorkbook,
-      "TBS_BTF_output_2024-02-02_03-04-05.xlsx",
-      {
-        compression: true,
-      },
+    // Get the file name and make sure it's right
+    const date = stringToDate(
+      mockSaveAs.mock.calls[0][1]!,
+      /TBS_BTF_output_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})\.xlsx/,
     );
+    expect(date.getTime() / 10000).toBeCloseTo(new Date().getTime() / 10000, 0); // to be within 10 seconds
   });
 
   it("should throw an error if something goes wrong during Excel file creation", async () => {
-    const extractedData: any[] = [];
-    const columnOrder: string[] = [];
-    const audit = { createdDate: "", loginDate: "", idir: "" };
-    const columnDefaults = { submissionId: "N/A", STATUS: "Pending" };
+    xlsxMock.writeBuffer.mockRejectedValue(new Error("excel failure"));
+    vi.spyOn(ExcelJS.Workbook.prototype, "xlsx", "get").mockReturnValue(
+      xlsxMock,
+    );
+
+    const inputData: Record<string, string | number | Date | null>[] = [];
+    const audit = {};
 
     // Expect the function to throw when an error occurs
-    await expect(
-      excelService.exportToExcel(
-        extractedData,
-        columnOrder,
-        columnDefaults,
-        audit,
-      ),
-    ).rejects.toThrow("Failed to create Excel file");
+    await expect(excelService.exportToExcel(inputData, audit)).rejects.toThrow(
+      "Failed to create Excel file",
+    );
 
-    // Ensure writeFile was not called
-    expect(mockXlsxWriteFile).not.toHaveBeenCalled();
+    // Ensure SaveAs was not called
+    expect(mockSaveAs).not.toHaveBeenCalled();
   });
 });

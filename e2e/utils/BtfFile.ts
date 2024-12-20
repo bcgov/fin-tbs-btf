@@ -5,6 +5,7 @@ import { LocalDateTime, ZonedDateTime } from "@js-joda/core";
 import { buffer } from "node:stream/consumers";
 import { utimes } from "node:fs/promises";
 import ExcelJS from "exceljs";
+import { workbookToJson } from "./excelUtils";
 
 /*
  * This file contains the functions and data manage and validate the
@@ -119,19 +120,7 @@ export class BtfGeneratedFile {
 
     const temp = new ExcelJS.Workbook();
     const workbook = await temp.xlsx.load(await buffer(stream));
-    const book: any[] = [];
-
-    workbook.eachSheet((worksheet) => {
-      const sheet: any[] = [];
-      worksheet.eachRow((row, rowNumber) => {
-        const rowData: any[] = [];
-        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-          rowData.push(cell.value); // Use `cell.value` to get the value of the cell
-        });
-        sheet.push(rowData); // Add the row data (array of cell values)
-      });
-      book.push(sheet); // Add the sheet to the book
-    });
+    const book: any[] = workbookToJson(workbook);
 
     expect(book).toHaveLength(2);
     const sheetData = book[0];
