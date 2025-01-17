@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
 import { ref } from "vue";
-import { InterMinistryTransferData } from "../services/InterMinistryTransferData";
+import { InterMinistryTransferFormData } from "../data/imtfData";
 
 export type UploadedFile = {
   uploadedFileId: string;
@@ -31,8 +31,8 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
     uploadedFiles.value.push(uploadedFile);
 
     try {
-      const data = new InterMinistryTransferData();
-      await data.importFromPDF(file);
+      const data = new InterMinistryTransferFormData();
+      await data.importFromPdf(file);
       uploadedFile.parsedData = data.fieldsData;
       const errors = data.getMissingRequiredFields();
       if (errors.length)

@@ -1,6 +1,6 @@
 import { DateTimeFormatter, LocalDateTime } from "@js-joda/core";
-import ExcelJS from "exceljs";
-import { fieldsMetadata } from "../constants";
+import { Workbook } from "exceljs";
+import { fieldsMetadata } from "../data/imtfMetadata";
 import { saveAs } from "file-saver";
 
 const excelService = {
@@ -16,7 +16,7 @@ const excelService = {
   ) {
     try {
       // Create a new workbook and worksheet
-      const workbook = new ExcelJS.Workbook();
+      const workbook = new Workbook();
       const worksheet = workbook.addWorksheet("DATA");
 
       worksheet.columns = fieldsMetadata.map((x) => ({
@@ -25,8 +25,8 @@ const excelService = {
         width: x.name.length * 1.25, // make slightly larger because headers are in all caps
         style: {
           numFmt: x.type === "date" ? "d-mmm-yy" : undefined,
-          alignment: x.horizontalalign
-            ? { horizontal: x.horizontalalign }
+          alignment: x.horizontalAlign
+            ? { horizontal: x.horizontalAlign }
             : undefined,
         },
       }));
