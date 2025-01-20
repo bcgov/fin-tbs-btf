@@ -13,9 +13,10 @@ setup("authenticate", async ({ page }) => {
 
   const loginPage = new LoginPage(page);
   await loginPage.visit();
-  await loginPage.expectLoginPage();
-  await loginPage.login();
-  await loginPage.expectLoggedIn();
+  if (!(await loginPage.isLoggedIn())) {
+    await loginPage.expectLoginPage();
+    await loginPage.login();
+  }
 
   await page.context().storageState({ path: authFile });
 });

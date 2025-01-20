@@ -12,6 +12,11 @@ export class LoginPage extends BasePage {
     });
   }
 
+  /** wait for the login page to be visible */
+  async waitFor() {
+    await this.loginButton.waitFor();
+  }
+
   async login() {
     await this.loginButton.click();
     await this.page.getByLabel("Enter your email, phone, or").click();

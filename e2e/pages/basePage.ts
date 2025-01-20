@@ -1,5 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { PagePaths } from "../utils/paths";
+import { LoginPage } from "./loginPage";
 
 export class BasePage {
   logoutButton: Locator;
@@ -21,6 +22,11 @@ export class BasePage {
     await this.page
       .locator(`[data-test-id="${process.env.E2E_AUTO_TEST_EMAIL}"]`)
       .click();
+    new LoginPage(this.page).waitFor(); // have to wait for the logout to complete or it is cancelled.
+  }
+
+  async isLoggedIn() {
+    return this.logoutButton.isVisible();
   }
 
   //////////
