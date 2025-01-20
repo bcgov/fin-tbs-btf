@@ -15,8 +15,8 @@ export class InterMinistryTransferFormData {
     return [];
   }
 
-  getMissingOptionalFields(): string[] {
-    return [];
+  getWarnings(): Record<string, string[]> {
+    return {};
   }
 }
 
@@ -33,9 +33,9 @@ export const ImtfdTestHelpers = {
         InterMinistryTransferFormData.prototype,
         "getMissingRequiredFields",
       ),
-      getMissingOptionalFields: vi.spyOn(
+      getWarnings: vi.spyOn(
         InterMinistryTransferFormData.prototype,
-        "getMissingOptionalFields",
+        "getWarnings",
       ),
     };
 

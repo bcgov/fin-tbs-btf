@@ -11,16 +11,16 @@
       <v-icon
         v-if="!uploadedFile.isLoading"
         :icon="
-          uploadedFile.validationErrors.length
+          Object.keys(uploadedFile.validationErrors).length
             ? 'mdi-alert-circle'
-            : uploadedFile.validationWarnings.length
+            : Object.keys(uploadedFile.validationWarnings).length
               ? 'mdi-alert'
               : 'mdi-check'
         "
         :color="
-          uploadedFile.validationErrors.length
+          Object.keys(uploadedFile.validationErrors).length
             ? 'error'
-            : uploadedFile.validationWarnings.length
+            : Object.keys(uploadedFile.validationWarnings).length
               ? 'orange'
               : 'success'
         "
@@ -28,12 +28,18 @@
       {{ uploadedFile.file.name }}<br />
       <div
         v-if="
-          uploadedFile.validationWarnings.length &&
-          !uploadedFile.validationErrors.length
+          Object.keys(uploadedFile.validationWarnings).length &&
+          !Object.keys(uploadedFile.validationErrors).length
         "
         class="ml-10 text-orange"
       >
-        PDF Missing fields: {{ uploadedFile.validationWarnings.join(", ") }}
+        <div
+          v-for="(warnings, name) in uploadedFile.validationWarnings"
+          :key="name"
+        >
+          <span class="font-weight-bold">{{ name }}:</span>
+          {{ warnings.join(", ") }}
+        </div>
       </div>
     </template>
     <template v-slot:append>

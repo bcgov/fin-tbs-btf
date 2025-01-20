@@ -40,7 +40,7 @@
         </v-card>
         <v-alert
           v-if="hasValidationWarnings"
-          :title="`${countValidationWarnings} file(s) have missing fields`"
+          :title="`${countValidationWarnings} file(s) have warnings`"
           text="The remaining data from those files will be included in your download"
           type="warning"
           icon="mdi-alert"
@@ -165,7 +165,8 @@ const hasValidationErrors = computed<boolean>(() => {
 /* number of files in the uploadedFilesStore with validation warnings. */
 const countValidationWarnings = computed<number>(() => {
   return uploadedFiles.value.filter(
-    (f) => f.validationWarnings?.length && !f.validationErrors?.length,
+    (f) =>
+      Object.keys(f.validationWarnings)?.length && !f.validationErrors?.length,
   ).length;
 });
 

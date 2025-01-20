@@ -16,6 +16,7 @@ export class PdfParseError extends Error {}
 
 export class InterMinistryTransferFormData {
   fieldsData: Record<string, string | number | Date | null> = {};
+  private warnings: Record<string, string[]> = {};
 
   /**
    * Parse a PDF file and extract the form fields.
@@ -61,6 +62,15 @@ export class InterMinistryTransferFormData {
     return missing;
   }
 
+  /** Get warnigns */
+  getWarnings(): Record<string, string[]> {
+    const deepCopyWarnings = JSON.parse(JSON.stringify(this.warnings));
+    const missingFields = this.getMissingOptionalFields();
+    if (missingFields.length)
+      deepCopyWarnings["Missing fields"] = missingFields;
+    return deepCopyWarnings;
+  }
+
   /** Set the value of the field while adhering to the rules. */
   private setField(name: string, value: string) {
     const meta = fieldsMetadataLookupByName.get(name);
@@ -69,9 +79,19 @@ export class InterMinistryTransferFormData {
     // change the type(string/number/date) to the correct one
     if (meta.overrideValue != null) this.fieldsData[name] = meta.overrideValue;
     else if (value == null) this.fieldsData[name] = value;
-    else if (meta.type == "number")
-      this.fieldsData[name] = Number.parseInt(value);
-    else if (meta.type == "date") {
+    else if (meta.type == "number") {
+      if (value?.trim().match(/^\d+$/)) {
+        this.fieldsData[name] = Number.parseInt(value);
+      } else if (!value?.trim()) {
+        this.fieldsData[name] = 0;
+      } else {
+        throw new PdfParseError(`Expected a number but received: '${value}'`);
+      }
+    } else if (meta.type == "date") {
+      if (!value) {
+        this.fieldsData[name] = null;
+        return;
+      }
       const date = LocalDate.parse(
         value,
         DateTimeFormatter.ofPattern("dd'-'MMM'-'yy").withLocale(Locale.US),
@@ -116,14 +136,24 @@ export class InterMinistryTransferFormData {
         }
       } else {
         // Other fields (e.g., text inputs)
+        // textContent is what the pdf displays to the user. For example if the user types "10.50" into
+        // a number fieldValue, textContent will be ["10"] because it only accepts whole numbers.
         if (
-          fieldsMetadataLookupByName.get(annotation.fieldName)
-            ?.useDisplayedValue
+          annotation?.textContent?.[0] != annotation.fieldValue && // If the textContent is different from the fieldValue
+          (annotation.fieldValue || annotation?.textContent?.[0]) // except if the textContent is empty and the fieldValue is empty
         )
-          this.setField(annotation.fieldName, annotation?.textContent?.[0]);
-        else this.setField(annotation.fieldName, annotation.fieldValue);
+          this.addWarning(annotation.fieldName, "Hidden information ignored");
+        this.setField(
+          annotation.fieldName,
+          annotation?.textContent?.[0] ?? annotation.fieldValue,
+        );
       }
     });
+  }
+
+  private addWarning(fieldName: string, label: string) {
+    if (!this.warnings[label]) this.warnings[label] = [];
+    this.warnings[label].push(fieldName);
   }
 
   /** Convert epocMilli (eg. from a file modified time) to the common document format. */

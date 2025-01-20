@@ -57,6 +57,8 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
     mimeType: "application/pdf",
     icon: "mdi-alert-circle",
   },
+  // semi-valid.pdf is the old form where some fields (FROM_CLIENT_CD, TO_CLIENT_CD) can't be
+  // pulled from the pdf, and also allows some invalid data (date and decimal points) are allowed.
   [FileAsset.SEMIVALID]: {
     fileName: "semi-valid.pdf",
     path: path.resolve("e2e", "assets", "semi-valid.pdf"),
@@ -66,7 +68,7 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
     validValues: [
       "TBS Use Only",
       "Processed",
-      null,
+      new Date("2020-02-20T00:00:00.000Z"), // in the pdf, this was typed by the user to be "Feb-20-20" which is wrong.
       new Date(assetLastModifiedDate_output),
       "Estimates",
       "TBS",
@@ -74,9 +76,10 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
       " ",
       null,
       " ",
-      NaN,
+      0,
       "",
-    ].concat(...Array(36).fill(NaN)),
+      22, // in the pdf, this was typed by the user to be "21.51" which is wrong.
+    ].concat(...Array(35).fill(0)),
   },
 };
 

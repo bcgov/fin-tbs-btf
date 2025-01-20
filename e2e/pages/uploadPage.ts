@@ -43,7 +43,7 @@ export class UploadPage extends BasePage {
     this.dropFileZone = this.page.locator("#dropzone");
     this.fileInput = this.page.locator("#fileChooser");
 
-    this.warningTitle = this.page.getByText("file(s) have missing fields");
+    this.warningTitle = this.page.getByText("file(s) have warnings");
     this.errorTitle = this.page.getByText(
       "file(s) have errors in formatting or content",
     );
