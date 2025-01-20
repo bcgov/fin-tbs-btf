@@ -1,13 +1,16 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { PagePaths } from "../utils/paths";
-import { LoginPage } from "./loginPage";
 
 export class BasePage {
   logoutButton: Locator;
+  loginButton: Locator;
   userName: Locator;
   constructor(public readonly page: Page) {
     this.logoutButton = this.page.getByRole("button", {
       name: "Logout",
+    });
+    this.loginButton = this.page.getByRole("button", {
+      name: "Login with IDIR MFA",
     });
     this.userName = this.page.getByTestId("account-info");
   }
@@ -22,7 +25,7 @@ export class BasePage {
     await this.page
       .locator(`[data-test-id="${process.env.E2E_AUTO_TEST_EMAIL}"]`)
       .click();
-    new LoginPage(this.page).waitFor(); // have to wait for the logout to complete or it is cancelled.
+    this.loginButton.waitFor(); // have to wait for the logout to complete or it is cancelled.
   }
 
   async isLoggedIn() {

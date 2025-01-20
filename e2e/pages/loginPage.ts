@@ -3,15 +3,6 @@ import { BasePage } from "./basePage";
 import { expect, Locator, Page } from "@playwright/test";
 
 export class LoginPage extends BasePage {
-  loginButton: Locator;
-
-  constructor(page: Page) {
-    super(page);
-    this.loginButton = this.page.getByRole("button", {
-      name: "Login with IDIR MFA",
-    });
-  }
-
   /** wait for the login page to be visible */
   async waitFor() {
     await this.loginButton.waitFor();
