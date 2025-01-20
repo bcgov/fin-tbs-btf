@@ -65,7 +65,7 @@ describe("UploadPage", () => {
       //the file was parsed (no errors were found)
       expect(spies.importFromPdf).toHaveBeenCalledTimes(1);
       expect(spies.getMissingRequiredFields).toHaveBeenCalledTimes(1);
-      expect(spies.getMissingOptionalFields).toHaveBeenCalledTimes(1);
+      expect(spies.getWarnings).toHaveBeenCalledTimes(1);
 
       //the file is added to the store
       expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
@@ -73,7 +73,8 @@ describe("UploadPage", () => {
         0,
       );
       expect(
-        uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+        Object.keys(uploadedFilesStore.uploadedFiles[0].validationWarnings)
+          .length,
       ).toBe(0);
 
       //the file appears in the list on the screen
@@ -104,7 +105,7 @@ describe("UploadPage", () => {
       //the file was parsed (no errors were found)
       expect(spies.importFromPdf).toHaveBeenCalledTimes(1);
       expect(spies.getMissingRequiredFields).toHaveBeenCalledTimes(1);
-      expect(spies.getMissingOptionalFields).toHaveBeenCalledTimes(1);
+      expect(spies.getWarnings).toHaveBeenCalledTimes(1);
 
       //the file is added to the store
       expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
@@ -112,7 +113,8 @@ describe("UploadPage", () => {
         0,
       );
       expect(
-        uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+        Object.keys(uploadedFilesStore.uploadedFiles[0].validationWarnings)
+          .length,
       ).toBe(0);
       expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
 
@@ -154,7 +156,8 @@ describe("UploadPage", () => {
           uploadedFilesStore.uploadedFiles[0].validationErrors.length,
         ).toBe(1);
         expect(
-          uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+          Object.keys(uploadedFilesStore.uploadedFiles[0].validationWarnings)
+            .length,
         ).toBe(0);
         expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
 
@@ -194,7 +197,7 @@ describe("UploadPage", () => {
         //the file was parsed (no errors were found)
         expect(spies.importFromPdf).toHaveBeenCalledTimes(1);
         expect(spies.getMissingRequiredFields).toHaveBeenCalledTimes(1);
-        expect(spies.getMissingOptionalFields).toHaveBeenCalledTimes(1);
+        expect(spies.getWarnings).toHaveBeenCalledTimes(1);
 
         //the file is added to the store
         expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
@@ -202,7 +205,8 @@ describe("UploadPage", () => {
           uploadedFilesStore.uploadedFiles[0].validationErrors.length,
         ).toBe(1);
         expect(
-          uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+          Object.keys(uploadedFilesStore.uploadedFiles[0].validationWarnings)
+            .length,
         ).toBe(0);
         expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
 
@@ -229,7 +233,7 @@ describe("UploadPage", () => {
     describe("If it doesn't have the optional fields", () => {
       it("The file is uploaded, and error shown on the page", async () => {
         const spies = ImtfdTestHelpers.getSpies();
-        spies.getMissingOptionalFields.mockReturnValueOnce(["field1"]); //warnings
+        spies.getWarnings.mockReturnValueOnce({ missing: ["field1"] }); //warnings
         const dropZone = component.getByText("Drop PDF files here");
 
         expect(uploadedFilesStore.uploadedFiles.length).toBe(0);
@@ -242,7 +246,7 @@ describe("UploadPage", () => {
         //the file was parsed (no errors were found)
         expect(spies.importFromPdf).toHaveBeenCalledTimes(1);
         expect(spies.getMissingRequiredFields).toHaveBeenCalledTimes(1);
-        expect(spies.getMissingOptionalFields).toHaveBeenCalledTimes(1);
+        expect(spies.getWarnings).toHaveBeenCalledTimes(1);
 
         //the file is added to the store
         expect(uploadedFilesStore.uploadedFiles.length).toBe(1);
@@ -250,7 +254,8 @@ describe("UploadPage", () => {
           uploadedFilesStore.uploadedFiles[0].validationErrors.length,
         ).toBe(0);
         expect(
-          uploadedFilesStore.uploadedFiles[0].validationWarnings.length,
+          Object.keys(uploadedFilesStore.uploadedFiles[0].validationWarnings)
+            .length,
         ).toBe(1);
         expect(uploadedFilesStore.uploadedFiles[0].isLoading).toBe(false);
 

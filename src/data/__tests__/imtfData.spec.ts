@@ -72,7 +72,7 @@ describe("InterMinistryTransferFormData", () => {
       });
     });
 
-    it("should suport number and date types", async () => {
+    it("should support number and date types", async () => {
       PdfjsTestHelpers.setMockAnnotations([
         { fieldName: "field_date", fieldValue: "10-Nov-24", fieldType: "Tx" },
         { fieldName: "field_number", fieldValue: "10", fieldType: "Tx" },
@@ -86,6 +86,21 @@ describe("InterMinistryTransferFormData", () => {
         field_overrideValue: "test override",
         field_date: new Date("2024-11-10T00:00:00.000Z"),
         field_number: 10,
+      });
+    });
+
+    it("should support convert empty value into 0", async () => {
+      PdfjsTestHelpers.setMockAnnotations([
+        { fieldName: "field_number", fieldValue: "0", fieldType: "Tx" },
+      ]);
+
+      const imtd = new InterMinistryTransferFormData();
+      await imtd.importFromPdf(mockPdfFile);
+
+      expect(imtd.fieldsData).toEqual({
+        LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"),
+        field_overrideValue: "test override",
+        field_number: 0,
       });
     });
 
@@ -183,7 +198,7 @@ describe("InterMinistryTransferFormData", () => {
       });
     });
 
-    it("should parse display value instead of user input if needed", async () => {
+    it("should parse display value instead of user input if needed and show warning if different", async () => {
       PdfjsTestHelpers.setMockAnnotations([
         {
           fieldName: "field_useDisplayedValue",
@@ -200,6 +215,11 @@ describe("InterMinistryTransferFormData", () => {
         LAST_ACTED_ON_AUDIT_TS: new Date("2024-10-09T00:00:00.000Z"),
         field_overrideValue: "test override",
         field_useDisplayedValue: "0",
+      });
+
+      expect(imtd.getWarnings()).toEqual({
+        "Hidden information ignored": ["field_useDisplayedValue"],
+        "Missing fields": ["field_number"],
       });
     });
 

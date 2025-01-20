@@ -39,7 +39,8 @@ export const useUploadedFilesStore = defineStore("uploadedFiles", () => {
         uploadedFile.validationErrors.value = [
           new Error("Missing required fields"),
         ];
-      uploadedFile.validationWarnings.value = data.getMissingOptionalFields();
+      //uploadedFile.validationWarnings.value = data.getMissingOptionalFields();
+      uploadedFile.validationWarnings.value = data.getWarnings();
     } catch (e) {
       uploadedFile.validationErrors.value = [new Error("Invalid PDF")];
     } finally {
