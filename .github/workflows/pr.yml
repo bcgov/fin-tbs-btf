@@ -54,6 +54,7 @@ jobs:
   test-e2e-admin:
     name: E2E-Admin
     needs: [build-deploy-pr]
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/.e2e.yml
     secrets: inherit
     with:
