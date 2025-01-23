@@ -15,6 +15,7 @@ permissions:
   pull-requests: write
 jobs:
   unit-tests:
+    if: github.event.action != 'closed'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout 🛎️
