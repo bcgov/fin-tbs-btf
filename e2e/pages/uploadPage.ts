@@ -89,7 +89,7 @@ export class UploadPage extends BasePage {
   // EXPECT
   //////////
 
-  /** expect the counts, filenames, icons, and missingFields to match inputted status. */
+  /** expect the counts, filenames, icons, and warningFields to match inputted status. */
   async expectAssets(assets: FileAsset[]) {
     await this.expectFileCount(
       assets.length,
@@ -104,7 +104,7 @@ export class UploadPage extends BasePage {
       await expect(
         this.fileList.nth(i).locator(".v-list-item__content"),
       ).toContainText(data.fileName);
-      for (const field of data.missingFields ?? []) {
+      for (const field of data.warningFields ?? []) {
         await expect(
           this.fileList.nth(i).locator(".v-list-item__content"),
         ).toContainText(field);

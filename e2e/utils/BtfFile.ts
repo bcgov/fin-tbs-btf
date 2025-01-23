@@ -25,7 +25,7 @@ export enum FileAsset {
 
 type AssetData = FileDropInfo & {
   icon: string;
-  missingFields?: string[];
+  warningFields?: string[];
   validValues?: (string | number | Date | null)[];
 };
 
@@ -49,7 +49,7 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
       "Health",
       2024,
       "test_19",
-    ].concat(...Array.from({ length: 36 }, (v, k) => k + 10)),
+    ].concat(...Array.from({ length: 36 }, (v, k) => (k + 10) * 100)),
   },
   [FileAsset.INVALID]: {
     fileName: "invalid.pdf",
@@ -64,7 +64,13 @@ export const dicToAssetToData: Record<FileAsset, AssetData> = {
     path: path.resolve("e2e", "assets", "semi-valid.pdf"),
     mimeType: "application/pdf",
     icon: "mdi-alert",
-    missingFields: ["FROM_CLIENT_CD", "TO_CLIENT_CD"],
+    warningFields: [
+      "FROM_CLIENT_CD",
+      "TO_CLIENT_CD",
+      "EFFECTIVE_DT",
+      "BUDGETR_GROSS_OPERATING_AMT",
+      "BUDGETR_RECOV_OPERATING_AMT",
+    ],
     validValues: [
       "TBS Use Only",
       "Processed",

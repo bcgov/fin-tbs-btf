@@ -64,11 +64,9 @@ export class InterMinistryTransferFormData {
 
   /** Get warnigns */
   getWarnings(): Record<string, string[]> {
-    const deepCopyWarnings = JSON.parse(JSON.stringify(this.warnings));
     const missingFields = this.getMissingOptionalFields();
-    if (missingFields.length)
-      deepCopyWarnings["Missing fields"] = missingFields;
-    return deepCopyWarnings;
+    if (missingFields.length) this.warnings["Missing fields"] = missingFields; // add "missing fields" to the warnings object
+    return this.warnings;
   }
 
   /** Set the value of the field while adhering to the rules. */
@@ -80,8 +78,9 @@ export class InterMinistryTransferFormData {
     if (meta.overrideValue != null) this.fieldsData[name] = meta.overrideValue;
     else if (value == null) this.fieldsData[name] = value;
     else if (meta.type == "number") {
-      if (value?.trim().match(/^\d+$/)) {
-        this.fieldsData[name] = Number.parseInt(value);
+      const numberValue = value?.trim().replace(",", "");
+      if (numberValue?.match(/^\d+$/)) {
+        this.fieldsData[name] = Number.parseInt(numberValue);
       } else if (!value?.trim()) {
         this.fieldsData[name] = 0;
       } else {
@@ -138,11 +137,17 @@ export class InterMinistryTransferFormData {
         // Other fields (e.g., text inputs)
         // textContent is what the pdf displays to the user. For example if the user types "10.50" into
         // a number fieldValue, textContent will be ["10"] because it only accepts whole numbers.
+        // If these two values are different, then we should warn the user.
         if (
-          annotation?.textContent?.[0] != annotation.fieldValue && // If the textContent is different from the fieldValue
-          (annotation.fieldValue || annotation?.textContent?.[0]) // except if the textContent is empty and the fieldValue is empty
-        )
+          fieldsMetadataLookupByName.get(annotation.fieldName)?.type == "number"
+            ? annotation?.textContent?.[0].replace(",", "") !=
+                annotation.fieldValue.replace(",", "") && // If the textContent is different from the fieldValue (except for commas in a number field)
+              (annotation.fieldValue || annotation?.textContent?.[0]) // except if the textContent is empty or the fieldValue is empty
+            : annotation?.textContent?.[0] != annotation.fieldValue && // If the textContent is different from the fieldValue
+              (annotation.fieldValue || annotation?.textContent?.[0]) // except if the textContent is empty or the fieldValue is empty
+        ) {
           this.addWarning(annotation.fieldName, "Hidden information ignored");
+        }
         this.setField(
           annotation.fieldName,
           annotation?.textContent?.[0] ?? annotation.fieldValue,
