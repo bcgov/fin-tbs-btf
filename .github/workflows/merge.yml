@@ -50,7 +50,7 @@ jobs:
           npm run build-test
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.7.2
+        uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           folder: dist # The folder the action should deploy.
           clean-exclude: |
