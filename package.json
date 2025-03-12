@@ -35,7 +35,7 @@
     "vuetify": "^3.7.2"
   },
   "devDependencies": {
-    "@pinia/testing": "^0.1.6",
+    "@pinia/testing": "^1.0.0",
     "@playwright/test": "^1.49.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/vue": "^8.1.0",
