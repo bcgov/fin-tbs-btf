@@ -1,17 +1,21 @@
-import { Download, expect, Locator, Page } from "playwright/test";
+import { expect } from "playwright/test";
+import type { Download, Locator, Page } from "playwright/test";
 import { BasePage } from "./basePage";
-import { dragAndDropFile, FileDropInfo } from "../utils/playwrightUtils";
+import { dragAndDropFile } from "../utils/playwrightUtils";
+import type { FileDropInfo } from "../utils/playwrightUtils";
 import {
   BtfGeneratedFile,
   dicToAssetToData,
   FileAsset,
 } from "../utils/BtfFile";
 
-export enum PageState {
-  SUCCESS,
-  ERROR,
-  WARNING,
-}
+export const PageState = {
+  SUCCESS: 0,
+  ERROR: 1,
+  WARNING: 2,
+} as const;
+
+export type PageState = (typeof PageState)[keyof typeof PageState];
 
 /**
  * This class provides functions to interact with the upload form.

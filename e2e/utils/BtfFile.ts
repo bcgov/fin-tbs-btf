@@ -1,6 +1,7 @@
-import { Download, expect } from "playwright/test";
+import { expect } from "playwright/test";
+import type { Download } from "playwright/test";
 import path from "path";
-import { FileDropInfo } from "./playwrightUtils";
+import type { FileDropInfo } from "./playwrightUtils";
 import { LocalDateTime, ZonedDateTime } from "@js-joda/core";
 import { buffer } from "node:stream/consumers";
 import { utimes } from "node:fs/promises";
@@ -17,11 +18,13 @@ import { workbookToJsonArray } from "./excelUtils";
 const assetLastModifiedDate_timestamp = "2024-10-21T19:09:00.000Z"; // Used to set the timestamp of the file
 const assetLastModifiedDate_output = "2024-10-21T00:00:00.000Z"; // The expected value to be shown in the output
 
-export enum FileAsset {
-  VALID,
-  INVALID,
-  SEMIVALID,
-}
+export const FileAsset = {
+  VALID: 0,
+  INVALID: 1,
+  SEMIVALID: 2,
+} as const;
+
+export type FileAsset = (typeof FileAsset)[keyof typeof FileAsset];
 
 type AssetData = FileDropInfo & {
   icon: string;
@@ -101,7 +104,11 @@ export const initAssets = async () => {
  * This class provides functions to interact with the downloaded file.
  */
 export class BtfGeneratedFile {
-  constructor(public readonly downloadedFile: Download) {}
+  readonly downloadedFile: Download;
+
+  constructor(downloadedFile: Download) {
+    this.downloadedFile = downloadedFile;
+  }
 
   //////////
   // EXPECT

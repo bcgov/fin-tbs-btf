@@ -1,11 +1,14 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { PagePaths } from "../utils/paths";
 
 export class BasePage {
+  readonly page: Page;
   logoutButton: Locator;
   loginButton: Locator;
   userName: Locator;
-  constructor(public readonly page: Page) {
+  constructor(page: Page) {
+    this.page = page;
     this.logoutButton = this.page.getByRole("button", {
       name: "Logout",
     });
