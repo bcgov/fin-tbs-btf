@@ -11,8 +11,7 @@ on:
   workflow_dispatch:
 concurrency: preview-${{ github.ref }}
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 jobs:
   unit-tests:
     if: github.event.action != 'closed'
@@ -31,6 +30,9 @@ jobs:
 
   build-deploy-pr:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
