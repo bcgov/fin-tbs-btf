@@ -8,7 +8,7 @@ concurrency:
   group: ${{ github.workflow }}
 
 permissions:
-  contents: write
+  contents: read
 jobs:
   semantic-version: # Create a semantic version based on the commit messages and tag the commit.
     outputs:
@@ -17,6 +17,8 @@ jobs:
       clean_changelog: ${{ steps.changelog.outputs.clean_changelog }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Conventional Changelog Update
@@ -34,6 +36,8 @@ jobs:
   build-deploy-test:
     needs: [semantic-version]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
